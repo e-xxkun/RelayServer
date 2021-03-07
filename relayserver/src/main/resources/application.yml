@@ -1,0 +1,48 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/p2pchat?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: xkk0512
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  redis:
+    host: localhost
+    database: 0
+    port: 6379
+    password:
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+    timeout: 3000ms
+
+#  rabbitmq:
+#    host: localhost # rabbitmq�����ӵ�ַ
+#    port: 5672 # rabbitmq�����Ӷ˿ں�
+#    virtual-host: /mall # rabbitmq������host
+#    username: mall # rabbitmq���û���
+#    password: xkk0512 # rabbitmq������
+#    publisher-confirms: true #������첽��Ϣ��Ҫ�ص���������Ϊtrue
+
+swagger:
+  basic:
+    enable: false
+
+mybatis:
+  mapper-locations:
+    - classpath:com/**/mapper/*.xml
+
+# redis key
+redis:
+  key:
+    prefix:
+      REDIS_USER_SESSION_KEY : "REDIS_USER_SESSION_KEY"
+      REDIS_USER_IDENTIFICATION_KEY : "REDIS_USER_IDENTIFICATION_KEY"
+    expire:
+      EXPIRE_TIME: 120
+
+
