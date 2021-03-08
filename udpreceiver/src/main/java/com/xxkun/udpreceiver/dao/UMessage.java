@@ -1,4 +1,4 @@
-package com.xxkun.udpreceiver;
+package com.xxkun.udpreceiver.dao;
 
 /**
  * @author xxkun
@@ -7,7 +7,7 @@ package com.xxkun.udpreceiver;
  * @date 2021-01-30 16:50
  */
 
-public class Message {
+public class UMessage {
 
     public static final int UDP_MSG_IN_BUFF_LEN = 1024;
     private static final String MSG_HEADER = "UDP";
@@ -16,12 +16,12 @@ public class Message {
     private final String body;
     private final MessageType type;
 
-    public Message(String body, MessageType type) {
+    public UMessage(String body, MessageType type) {
         this.body = body;
         this.type = type;
     }
 
-    public static Message msgUnpack(String msgStr) {
+    public static UMessage msgUnpack(String msgStr) {
         String[] pSplit = msgStr.split(MSG_SPLIT);
         if (pSplit.length >= 2) {
             String header = pSplit[0];
@@ -31,7 +31,7 @@ public class Message {
                 if (pSplit.length > 2) {
                     body = pSplit[2];
                 }
-                return new Message(body, type);
+                return new UMessage(body, type);
             }
         }
         return null;
@@ -48,6 +48,13 @@ public class Message {
     @Override
     public String toString() {
         return MSG_HEADER + MSG_SPLIT + type.getCode() + MSG_SPLIT + (body == null ? "" : body + MSG_SPLIT);
+    }
+
+    public String getToken() {
+        return null;
+    }
+
+    public void setIdentifier(UserIdentifier userIdentifier) {
     }
 
     public enum MessageType {
