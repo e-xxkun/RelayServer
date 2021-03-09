@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
       <module fileurl="file://$PROJECT_DIR$/relayserver/relayserver.iml" filepath="$PROJECT_DIR$/relayserver/relayserver.iml" />
       <module fileurl="file://$PROJECT_DIR$/udpreceiver/udpreceiver.iml" filepath="$PROJECT_DIR$/udpreceiver/udpreceiver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/udpsender/udpsender.iml" filepath="$PROJECT_DIR$/udpsender/udpsender.iml" />
     </modules>
   </component>
 </project>

@@ -5,6 +5,7 @@
       <list>
         <option value="$PROJECT_DIR$/relayserver/pom.xml" />
         <option value="$PROJECT_DIR$/udpreceiver/pom.xml" />
+        <option value="$PROJECT_DIR$/udpsender/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
