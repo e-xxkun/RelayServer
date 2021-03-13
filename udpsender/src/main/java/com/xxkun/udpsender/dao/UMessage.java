@@ -16,6 +16,8 @@ public class UMessage {
     private final String body;
     private final MessageType type;
 
+    private UDPField udpField;
+
     public UMessage(String body, MessageType type) {
         this.body = body;
         this.type = type;
