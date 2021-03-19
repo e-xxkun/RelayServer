@@ -1,44 +1,71 @@
 package com.xxkun.udpsender.component;
 
 import com.xxkun.udpsender.dao.Message;
+import com.xxkun.udpsender.dao.UClient;
 
+import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 
 public class MessageCache {
 
     private final DelayQueue<Message> delayQueue;
 
-    private final HashSet<Message> msgSet;
+    private final ConcurrentHashMap<InetSocketAddress, UClient> clientMap;
 
     private UDPMessageSender messageSender;
 
     private MsgTimeoutListenThread timeoutListenThread;
 
-    public MessageCache(DelayQueue<Message> delayQueue, HashSet<Message> msgSet) {
+    public MessageCache(DelayQueue<Message> delayQueue, ConcurrentHashMap<InetSocketAddress, UClient> clientMap) {
         this.delayQueue = delayQueue;
-        this.msgSet = msgSet;
+        this.clientMap = clientMap;
         timeoutListenThread = new MsgTimeoutListenThread();
         timeoutListenThread.start();
     }
 
     public boolean addToCache(Message message) {
         delayQueue.add(message);
-        msgSet.add(message);
+        UClient client = clientMap.get(message.getSocketAddress());
+        if (client == null) {
+            client = new UClient(message.getSocketAddress());
+            clientMap.put(message.getSocketAddress(), client);
+        }
+        client.addMessage(message);
         return true;
     }
 
     public boolean ack(Message message) {
-        if (msgSet.contains(message)) {
-            msgSet.remove(message);
+        UClient client = clientMap.get(message.getSocketAddress());
+        if (client != null) {
 //            delayQueue.remove(message);
-            return true;
+            boolean res = client.removeMessage(message);
+            if (client.msgSize() == 0) {
+                clientMap.remove(client.getSocketAddress());
+            }
+            return res;
         }
         return false;
     }
 
+    public long getCurSeqOfClient(Message message) {
+        delayQueue.add(message);
+        UClient client = clientMap.get(message.getSocketAddress());
+        if (client == null) {
+            client = new UClient(message.getSocketAddress());
+            clientMap.put(message.getSocketAddress(), client);
+        }
+        return client.getCurSeq();
+    }
+
     public boolean isTimeout(Message message) {
-        return msgSet.contains(message);
+        UClient client = clientMap.get(message.getSocketAddress());
+        if (client != null) {
+            return client.containsMessage(message);
+        }
+        return true;
     }
 
     private void resendMsg(Message message) {

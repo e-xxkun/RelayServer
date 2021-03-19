@@ -2,6 +2,7 @@ package com.xxkun.udpsender.dao;
 
 import reactor.util.annotation.NonNull;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
@@ -37,4 +38,6 @@ public abstract class Message implements Delayed {
     }
 
     public abstract UDPField convertToUDPField();
+
+    public abstract InetSocketAddress getSocketAddress();
 }
