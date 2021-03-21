@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/PersonalRepository.iml" filepath="$PROJECT_DIR$/.idea/PersonalRepository.iml" />
+      <module fileurl="file://$PROJECT_DIR$/relayserver/relayserver.iml" filepath="$PROJECT_DIR$/relayserver/relayserver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/relayserver_udp/relayserver_udp.iml" filepath="$PROJECT_DIR$/relayserver_udp/relayserver_udp.iml" />
     </modules>
   </component>
 </project>

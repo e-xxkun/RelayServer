@@ -17,11 +17,11 @@
             <property name="nullCatalogMeansCurrent" value="true" />
         </jdbcConnection>
         <!--指定生成model的路径-->
-        <javaModelGenerator targetPackage="com.xxkun.udpsender.dao.mbg.model" targetProject="src/main/java"/>
+        <javaModelGenerator targetPackage="com.xxkun.relayserver_udp.dao.mbg.model" targetProject="src/main/java"/>
         <!--指定生成mapper.xml的路径-->
-        <sqlMapGenerator targetPackage="com.xxkun.udpsender.dao.mbg.mapper" targetProject="src/main/resources"/>
+        <sqlMapGenerator targetPackage="com.xxkun.relayserver_udp.dao.mbg.mapper" targetProject="src/main/resources"/>
         <!--指定生成mapper接口的的路径-->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="com.xxkun.udpsender.dao.mbg.mapper" targetProject="src/main/java"/>
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.xxkun.relayserver_udp.dao.mbg.mapper" targetProject="src/main/java"/>
 
         <table tableName="user">
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
