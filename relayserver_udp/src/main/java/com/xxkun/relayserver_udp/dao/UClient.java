@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class UClient {
-    private Set<Message> msgSet;
+    private Set<UDPField> msgSet;
 
     private InetSocketAddress socketAddress;
 
@@ -19,15 +19,15 @@ public class UClient {
         msgSet = new HashSet<>();
     }
 
-    public void addMessage(Message message) {
-        msgSet.add(message);
+    public void addUDPMsg(UDPField udpMsg) {
+        msgSet.add(udpMsg);
     }
 
-    public boolean removeMessage(Message message) {
+    public boolean removeMessage(UDPField udpMsg) {
         return true;
     }
 
-    public boolean containsMessage(Message message) {
+    public boolean containsMessage(UDPField udpMsg) {
         return true;
     }
 
@@ -55,4 +55,5 @@ public class UClient {
     public InetSocketAddress getSocketAddress() {
         return socketAddress;
     }
+
 }

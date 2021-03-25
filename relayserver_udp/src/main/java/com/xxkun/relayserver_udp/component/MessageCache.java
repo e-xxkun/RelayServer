@@ -1,7 +1,7 @@
 package com.xxkun.relayserver_udp.component;
 
-import com.xxkun.relayserver_udp.dao.Message;
 import com.xxkun.relayserver_udp.dao.UClient;
+import com.xxkun.relayserver_udp.dao.UDPField;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,37 +9,40 @@ import java.util.concurrent.DelayQueue;
 
 public class MessageCache {
 
-    private final DelayQueue<Message> delayQueue;
+    private final DelayQueue<UDPField> delayQueue;
 
     private final ConcurrentHashMap<InetSocketAddress, UClient> clientMap;
 
-    private UDPMessageSender messageSender;
-
     private MsgTimeoutListenThread timeoutListenThread;
 
-    public MessageCache(DelayQueue<Message> delayQueue, ConcurrentHashMap<InetSocketAddress, UClient> clientMap) {
-        this.delayQueue = delayQueue;
-        this.clientMap = clientMap;
+    private OnMsgTimeout onMsgTimeout;
+
+    public MessageCache(OnMsgTimeout onMsgTimeout) {
+        this.onMsgTimeout = onMsgTimeout;
+        delayQueue = new DelayQueue<>();
+        clientMap = new ConcurrentHashMap<>();
         timeoutListenThread = new MsgTimeoutListenThread();
         timeoutListenThread.start();
     }
 
-    public boolean addToCache(Message message) {
-        delayQueue.add(message);
-        UClient client = clientMap.get(message.getSocketAddress());
+    public void addToCache(UDPField udpMsg) {
+        delayQueue.add(udpMsg);
+        UClient client = clientMap.get(udpMsg.getSocketAddress());
         if (client == null) {
-            client = new UClient(message.getSocketAddress());
-            clientMap.put(message.getSocketAddress(), client);
+            client = new UClient(udpMsg.getSocketAddress());
+            clientMap.put(udpMsg.getSocketAddress(), client);
         }
-        client.addMessage(message);
-        return true;
+        if (!udpMsg.isResend()) {
+            udpMsg.setSeq(client.getCurSeq());
+        }
+        client.addUDPMsg(udpMsg);
     }
 
-    public boolean ack(Message message) {
-        UClient client = clientMap.get(message.getSocketAddress());
+    public boolean ack(UDPField udpMsg) {
+        UClient client = clientMap.get(udpMsg.getSocketAddress());
         if (client != null) {
 //            delayQueue.remove(message);
-            boolean res = client.removeMessage(message);
+            boolean res = client.removeMessage(udpMsg);
             if (client.msgSize() == 0) {
                 clientMap.remove(client.getSocketAddress());
             }
@@ -48,26 +51,12 @@ public class MessageCache {
         return false;
     }
 
-    public long getCurSeqOfClient(Message message) {
-        delayQueue.add(message);
-        UClient client = clientMap.get(message.getSocketAddress());
-        if (client == null) {
-            client = new UClient(message.getSocketAddress());
-            clientMap.put(message.getSocketAddress(), client);
-        }
-        return client.getCurSeq();
-    }
-
-    public boolean isTimeout(Message message) {
-        UClient client = clientMap.get(message.getSocketAddress());
+    public boolean isTimeout(UDPField udpMsg) {
+        UClient client = clientMap.get(udpMsg.getSocketAddress());
         if (client != null) {
-            return client.containsMessage(message);
+            return client.containsMessage(udpMsg);
         }
         return true;
-    }
-
-    private void resendMsg(Message message) {
-        messageSender.send(message.convertToUDPField());
     }
 
     public class MsgTimeoutListenThread extends Thread {
@@ -75,9 +64,9 @@ public class MessageCache {
         public void run() {
             while (true) {
                 try {
-                    Message msg = delayQueue.take();
+                    UDPField msg = delayQueue.take();
                     if (isTimeout(msg)) {
-                        resendMsg(msg);
+                        onMsgTimeout.onMsgTimeout(msg);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -85,5 +74,9 @@ public class MessageCache {
                 }
             }
         }
+    }
+
+    public interface OnMsgTimeout {
+        void onMsgTimeout(UDPField msg);
     }
 }

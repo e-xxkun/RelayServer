@@ -6,22 +6,12 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
-public abstract class Message implements Delayed {
+public abstract class Message {
 
     private final UDPField udpField;
 
     public Message(@NonNull UDPField udpField) {
         this.udpField = udpField;
-    }
-
-    @Override
-    public long getDelay(TimeUnit unit) {
-        return udpField.getSendDate();
-    }
-
-    @Override
-    public int compareTo(Delayed o) {
-        return (int) (this.getDelay(TimeUnit.MILLISECONDS) - o.getDelay(TimeUnit.MILLISECONDS));
     }
 
     @Override

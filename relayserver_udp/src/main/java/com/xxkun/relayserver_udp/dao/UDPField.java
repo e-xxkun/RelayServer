@@ -2,12 +2,16 @@ package com.xxkun.relayserver_udp.dao;
 
 import java.net.InetSocketAddress;
 import java.util.Date;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 
-public class UDPField {
+public class UDPField implements Delayed {
+
+    private static final int MAX_RESEND_TIME = 4;
 
     public static final String HEAD = "US";
 
-    private String seq;
+    private Long seq;
 
     private Date sendDate;
 
@@ -27,7 +31,9 @@ public class UDPField {
 
     private String id;
 
-    public UDPField(String seq, InetSocketAddress socketAddress, Integer rtt, Integer cmdId, Integer clientVersion, Integer bodyLength) {
+    private int resendTime = 0;
+
+    public UDPField(Long seq, InetSocketAddress socketAddress, Integer rtt, Integer cmdId, Integer clientVersion, Integer bodyLength) {
         this.seq = seq;
         this.socketAddress = socketAddress;
         this.rtt = rtt;
@@ -56,5 +62,35 @@ public class UDPField {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+        return getSendDate();
+    }
+
+    @Override
+    public int compareTo(Delayed o) {
+        return (int) (this.getDelay(TimeUnit.MILLISECONDS) - o.getDelay(TimeUnit.MILLISECONDS));
+    }
+
+    public void setSeq(Long seq) {
+        this.seq = seq;
+    }
+
+    public InetSocketAddress getSocketAddress() {
+        return socketAddress;
+    }
+
+    public void incResendTime() {
+        ++ resendTime;
+    }
+
+    public boolean isMaxResendTime() {
+        return resendTime >= MAX_RESEND_TIME;
+    }
+
+    public boolean isResend() {
+        return resendTime > 0;
     }
 }
