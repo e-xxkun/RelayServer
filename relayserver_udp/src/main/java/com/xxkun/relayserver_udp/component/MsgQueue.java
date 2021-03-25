@@ -1,12 +1,11 @@
 package com.xxkun.relayserver_udp.component;
 
-import com.xxkun.relayserver_udp.UDPReceiveLoopThread;
 import com.xxkun.relayserver_udp.dao.UMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.SocketAddress;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Component
 public class MsgQueue implements IMsgQueue {
@@ -14,8 +13,10 @@ public class MsgQueue implements IMsgQueue {
     @Autowired
     private OnMessage onMessage;
 
-    private LinkedBlockingQueue<UMessage> queue;
-    private MsgListenThread msgListenThread;
+    private final LinkedBlockingQueue<UMessage> queue;
+
+    private final MsgListenThread msgListenThread;
+
 
     public MsgQueue() {
         queue = new LinkedBlockingQueue<>();
@@ -24,18 +25,27 @@ public class MsgQueue implements IMsgQueue {
     }
 
     @Override
-    public void sendMessage(UMessage msg) {
+    public boolean sendMessage(UMessage msg) {
         try {
             queue.put(msg);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            return false;
         }
+        return true;
+    }
+
+    public void close() {
+        msgListenThread.close();
     }
 
     class MsgListenThread extends Thread {
+
+        private boolean stop = false;
+
         @Override
         public void run() {
-            while (true) {
+            while (!stop) {
                 UMessage message = null;
                 try {
                     message = queue.take();
@@ -46,6 +56,11 @@ public class MsgQueue implements IMsgQueue {
                     onMessage.onMessage(message);
                 }
             }
+        }
+
+        public void close() {
+            stop = true;
+
         }
     }
 }

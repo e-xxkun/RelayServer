@@ -15,7 +15,7 @@ public class MessageCache {
 
     private MsgTimeoutListenThread timeoutListenThread;
 
-    private OnMsgTimeout onMsgTimeout;
+    private final OnMsgTimeout onMsgTimeout;
 
     public MessageCache(OnMsgTimeout onMsgTimeout) {
         this.onMsgTimeout = onMsgTimeout;
