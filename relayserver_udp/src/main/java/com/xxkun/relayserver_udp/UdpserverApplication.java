@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class UdpreceiverApplication {
+public class UdpserverApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(UdpreceiverApplication.class, args);
+        SpringApplication.run(UdpserverApplication.class, args);
 
 //        if (args.length != 1) {
 //            System.out.println("Usage: java " + Server.class.getName() + " <port>\n");

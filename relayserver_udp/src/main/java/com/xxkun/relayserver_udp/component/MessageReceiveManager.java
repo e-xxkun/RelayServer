@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.SocketAddress;
 
-public class MessageManager implements UDPReceiveLoopThread.OnMessage {
+public class MessageReceiveManager implements UDPReceiveLoopThread.OnMessage {
 
     @Autowired
     private UserInfoManageService userInfoManageService;

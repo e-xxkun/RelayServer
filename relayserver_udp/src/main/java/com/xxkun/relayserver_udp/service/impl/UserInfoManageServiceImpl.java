@@ -6,7 +6,9 @@ import com.xxkun.relayserver_udp.dao.UserSession;
 import com.xxkun.relayserver_udp.service.UserInfoManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserInfoManageServiceImpl implements UserInfoManageService {
 
     @Autowired
