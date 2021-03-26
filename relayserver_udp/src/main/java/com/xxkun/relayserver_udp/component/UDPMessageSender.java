@@ -2,20 +2,20 @@ package com.xxkun.relayserver_udp.component;
 
 import com.xxkun.relayserver_udp.common.utils.MessageUtil;
 import com.xxkun.relayserver_udp.dao.UDPField;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
+@Component
 public class UDPMessageSender implements MessageCache.OnMsgTimeout{
 
-    private final DatagramSocket socket;
-
+    @Autowired
+    private DatagramSocket socket;
+    @Autowired
     private MessageCache messageCache;
-
-    public UDPMessageSender(DatagramSocket socket) {
-        this.socket = socket;
-    }
 
     public void send(UDPField udpField) {
         try {

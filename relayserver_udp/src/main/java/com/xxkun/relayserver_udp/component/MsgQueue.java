@@ -12,11 +12,12 @@ public class MsgQueue implements IMsgQueue {
 
     @Autowired
     private OnMessage onMessage;
+    @Autowired
+    private ThreadPoolExecutor msgQueueThreadPool;
 
     private final LinkedBlockingQueue<UMessage> queue;
 
     private final MsgListenThread msgListenThread;
-
 
     public MsgQueue() {
         queue = new LinkedBlockingQueue<>();
@@ -37,12 +38,12 @@ public class MsgQueue implements IMsgQueue {
 
     public void close() {
         msgListenThread.close();
+        if (!msgQueueThreadPool.isShutdown()) {
+            msgQueueThreadPool.shutdown();
+        }
     }
 
-    class MsgListenThread extends Thread {
-
-        private boolean stop = false;
-
+    class MsgListenThread extends BaseThread {
         @Override
         public void run() {
             while (!stop) {
@@ -53,14 +54,10 @@ public class MsgQueue implements IMsgQueue {
                     e.printStackTrace();
                 }
                 if (message != null) {
-                    onMessage.onMessage(message);
+                    UMessage finalMessage = message;
+                    msgQueueThreadPool.execute(() -> onMessage.onMessage(finalMessage));
                 }
             }
-        }
-
-        public void close() {
-            stop = true;
-
         }
     }
 }

@@ -9,12 +9,10 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Component
-public class MessageSendManager implements IMsgQueue.OnMessage, Runnable{
+public class MessageSendHandler implements IMsgQueue.OnMessage{
 
     @Autowired
     private HeartbeatMsgHandler heartbeatMsgHandler;
-    @Autowired
-    private ThreadPoolExecutor msgQueueThreadPool;
 
     @Override
     public void onMessage(UMessage msg) {
@@ -39,10 +37,5 @@ public class MessageSendManager implements IMsgQueue.OnMessage, Runnable{
             case NPT_STEP_2:
                 break;
         }
-    }
-
-    @Override
-    public void run() {
-
     }
 }

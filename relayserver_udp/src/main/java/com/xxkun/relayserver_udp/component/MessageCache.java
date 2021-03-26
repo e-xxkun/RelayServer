@@ -2,23 +2,25 @@ package com.xxkun.relayserver_udp.component;
 
 import com.xxkun.relayserver_udp.dao.UClient;
 import com.xxkun.relayserver_udp.dao.UDPField;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 
+@Component
 public class MessageCache {
+    @Autowired
+    private OnMsgTimeout onMsgTimeout;
 
     private final DelayQueue<UDPField> delayQueue;
 
     private final ConcurrentHashMap<InetSocketAddress, UClient> clientMap;
 
-    private MsgTimeoutListenThread timeoutListenThread;
+    private final MsgTimeoutListenThread timeoutListenThread;
 
-    private final OnMsgTimeout onMsgTimeout;
-
-    public MessageCache(OnMsgTimeout onMsgTimeout) {
-        this.onMsgTimeout = onMsgTimeout;
+    public MessageCache() {
         delayQueue = new DelayQueue<>();
         clientMap = new ConcurrentHashMap<>();
         timeoutListenThread = new MsgTimeoutListenThread();
@@ -59,10 +61,14 @@ public class MessageCache {
         return true;
     }
 
-    public class MsgTimeoutListenThread extends Thread {
+    public void close() {
+        timeoutListenThread.close();
+    }
+
+    public class MsgTimeoutListenThread extends BaseThread {
         @Override
         public void run() {
-            while (true) {
+            while (stop) {
                 try {
                     UDPField msg = delayQueue.take();
                     if (isTimeout(msg)) {
