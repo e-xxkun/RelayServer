@@ -10,7 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 @Component
-public class UDPMessageSender implements MessageCache.OnMsgTimeout{
+public class MessageSender implements MessageCache.OnMsgTimeout{
 
     @Autowired
     private DatagramSocket socket;

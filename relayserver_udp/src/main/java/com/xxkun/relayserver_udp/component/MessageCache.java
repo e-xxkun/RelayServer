@@ -40,7 +40,7 @@ public class MessageCache {
         client.addUDPMsg(udpMsg);
     }
 
-    public boolean ack(UDPField udpMsg) {
+    public void ack(UDPField udpMsg) {
         UClient client = clientMap.get(udpMsg.getSocketAddress());
         if (client != null) {
 //            delayQueue.remove(message);
@@ -48,9 +48,7 @@ public class MessageCache {
             if (client.msgSize() == 0) {
                 clientMap.remove(client.getSocketAddress());
             }
-            return res;
         }
-        return false;
     }
 
     public boolean isTimeout(UDPField udpMsg) {

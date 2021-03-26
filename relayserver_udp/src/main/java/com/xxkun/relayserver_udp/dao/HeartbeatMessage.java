@@ -1,5 +1,7 @@
 package com.xxkun.relayserver_udp.dao;
 
+import com.xxkun.relayserver_udp.dto.MessageType;
+
 import java.net.InetSocketAddress;
 
 public class HeartbeatMessage extends Message {
@@ -14,7 +16,12 @@ public class HeartbeatMessage extends Message {
     }
 
     @Override
-    public InetSocketAddress getSocketAddress() {
+    public String getToken() {
+        return null;
+    }
+
+    @Override
+    public MessageType getType() {
         return null;
     }
 }

@@ -1,12 +1,12 @@
 package com.xxkun.relayserver_udp.component;
 
-import com.xxkun.relayserver_udp.dao.UMessage;
+import com.xxkun.relayserver_udp.dao.Message;
 
 public interface IMsgQueue {
 
-    boolean sendMessage(UMessage msg);
+    boolean sendMessage(Message msg);
 
     interface OnMessage {
-        void onMessage(UMessage msg);
+        void onMessage(Message msg);
     }
 }

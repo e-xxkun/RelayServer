@@ -37,7 +37,7 @@ public class Server {
             e.printStackTrace();
             return;
         }
-        new UDPReceiveLoopThread(server, this::onMessage).start();
+//        new MessageListener(server, (from, msg) -> onMessage(from, msg)).start();
 //        heartbeatThread = new HeartbeatThread();
 //        heartbeatThread.start();
     }

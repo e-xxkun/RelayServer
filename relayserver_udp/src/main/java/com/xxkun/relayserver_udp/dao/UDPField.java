@@ -17,19 +17,19 @@ public class UDPField implements Delayed {
 
     private Date receiveDate;
 
-    private InetSocketAddress socketAddress;
+    private final InetSocketAddress socketAddress;
 
-    private Integer rtt;
+    private final Integer rtt;
 
-    private Integer cmdId;
+    private final UDPFieldType type;
 
-    private Integer clientVersion;
+    private final Integer clientVersion;
 
-    private Integer bodyLength;
+    private final Integer bodyLength;
 
     private String body;
 
-    private String id;
+    private final String id;
 
     private int resendTime = 0;
 
@@ -37,7 +37,7 @@ public class UDPField implements Delayed {
         this.seq = seq;
         this.socketAddress = socketAddress;
         this.rtt = rtt;
-        this.cmdId = cmdId;
+        this.type = UDPFieldType.valueOf(cmdId);
         this.clientVersion = clientVersion;
         this.bodyLength = bodyLength;
         this.id = this.socketAddress.toString() + this.seq;
@@ -45,6 +45,22 @@ public class UDPField implements Delayed {
 
     public Integer getRtt() {
         return rtt;
+    }
+
+    public Date getReceiveDate() {
+        return receiveDate;
+    }
+
+    public UDPFieldType getType() {
+        return type;
+    }
+
+    public Integer getClientVersion() {
+        return clientVersion;
+    }
+
+    public Integer getBodyLength() {
+        return bodyLength;
     }
 
     public long getSendDate() {
@@ -92,5 +108,40 @@ public class UDPField implements Delayed {
 
     public boolean isResend() {
         return resendTime > 0;
+    }
+
+    public boolean isACK() {
+        return type.isACK();
+    }
+
+    public enum UDPFieldType {
+        ACK(0){
+            @Override
+            public boolean isACK() {
+                return true;
+            }
+        },
+        UNKNOWN(1);
+
+        private final int cmdId;
+
+        UDPFieldType(int cmdId) {
+            this.cmdId = cmdId;
+        }
+
+        public static UDPFieldType valueOf(int cmdId) {
+            if (cmdId > -1 && cmdId < UDPFieldType.values().length) {
+                return UDPFieldType.values()[cmdId];
+            }
+            return UNKNOWN;
+        }
+
+        public int getCmdId() {
+            return cmdId;
+        }
+
+        public boolean isACK() {
+            return false;
+        }
     }
 }

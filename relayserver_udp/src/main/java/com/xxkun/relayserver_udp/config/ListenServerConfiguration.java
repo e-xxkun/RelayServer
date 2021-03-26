@@ -22,4 +22,14 @@ public class ListenServerConfiguration {
         }
         return serverSocket;
     }
+
+    @Bean(value = "msgReceiveThreadPool")
+    public ThreadPoolExecutor msgReceiveThreadPool() {
+        return new ThreadPoolExecutor(6, 15, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+    }
+
+    @Bean(value = "msgSendThreadPool")
+    public ThreadPoolExecutor msgSendThreadPool() {
+        return new ThreadPoolExecutor(6, 15, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+    }
 }

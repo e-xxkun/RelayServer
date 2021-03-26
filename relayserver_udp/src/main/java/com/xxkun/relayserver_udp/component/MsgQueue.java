@@ -1,21 +1,22 @@
 package com.xxkun.relayserver_udp.component;
 
+import com.xxkun.relayserver_udp.dao.Message;
 import com.xxkun.relayserver_udp.dao.UMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Component
 public class MsgQueue implements IMsgQueue {
-
     @Autowired
     private OnMessage onMessage;
-    @Autowired
+    @Resource(name = "msgSendThreadPool")
     private ThreadPoolExecutor msgQueueThreadPool;
 
-    private final LinkedBlockingQueue<UMessage> queue;
+    private final LinkedBlockingQueue<Message> queue;
 
     private final MsgListenThread msgListenThread;
 
@@ -26,7 +27,7 @@ public class MsgQueue implements IMsgQueue {
     }
 
     @Override
-    public boolean sendMessage(UMessage msg) {
+    public boolean sendMessage(Message msg) {
         try {
             queue.put(msg);
         } catch (InterruptedException e) {
@@ -47,14 +48,14 @@ public class MsgQueue implements IMsgQueue {
         @Override
         public void run() {
             while (!stop) {
-                UMessage message = null;
+                Message message = null;
                 try {
                     message = queue.take();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 if (message != null) {
-                    UMessage finalMessage = message;
+                    Message finalMessage = message;
                     msgQueueThreadPool.execute(() -> onMessage.onMessage(finalMessage));
                 }
             }
