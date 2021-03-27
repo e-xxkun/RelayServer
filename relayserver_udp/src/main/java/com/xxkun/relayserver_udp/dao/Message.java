@@ -44,4 +44,11 @@ public abstract class Message {
     public abstract String getToken();
 
     public abstract MessageType getType();
+
+    public static Message decodeFromByteArray(byte[] bytes, InetSocketAddress socketAddress) {
+        UDPField udpField = UDPField.decodeFromByteArray(bytes, socketAddress);
+        if (udpField == null)
+            return null;
+        return null;
+    }
 }

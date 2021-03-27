@@ -20,7 +20,7 @@ public class MessageSender implements MessageCache.OnMsgTimeout{
     public void send(UDPField udpField) {
         try {
             messageCache.addToCache(udpField);
-            DatagramPacket packet = MessageUtil.decodeUDPField(udpField);
+            DatagramPacket packet = MessageUtil.encodeUDPFieldToDatagramPacket(udpField);
             if (packet == null) {
                 return;
             }

@@ -1,6 +1,7 @@
 package com.xxkun.relayserver_udp.dao;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -9,7 +10,9 @@ public class UDPField implements Delayed {
 
     private static final int MAX_RESEND_TIME = 4;
 
-    public static final String HEAD = "US";
+    public static final int HEAD = 0xFEFDDFEB;
+
+    public static final int HEAD_LEN = 28;
 
     private Long seq;
 
@@ -33,7 +36,7 @@ public class UDPField implements Delayed {
 
     private int resendTime = 0;
 
-    public UDPField(Long seq, InetSocketAddress socketAddress, Integer rtt, Integer cmdId, Integer clientVersion, Integer bodyLength) {
+    public UDPField(Long seq, Integer clientVersion, Integer cmdId, Integer rtt, Integer bodyLength, InetSocketAddress socketAddress) {
         this.seq = seq;
         this.socketAddress = socketAddress;
         this.rtt = rtt;
@@ -112,6 +115,27 @@ public class UDPField implements Delayed {
 
     public boolean isACK() {
         return type.isACK();
+    }
+
+    public static UDPField decodeFromByteArray(byte[] bytes, InetSocketAddress socketAddress) {
+        if (bytes.length < HEAD_LEN)
+            return null;
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        if (buffer.getInt() != HEAD)
+            return null;
+        long seq = buffer.getLong();
+
+        int clientVersion = buffer.getInt();
+
+        int cmdId = buffer.getInt();
+        if (cmdId >= UDPFieldType.values().length)
+            return null;
+
+        int rtt = buffer.getInt();
+
+        int bodyLength = buffer.getInt();
+
+        return new UDPField(seq, clientVersion, cmdId, rtt, bodyLength, socketAddress);
     }
 
     public enum UDPFieldType {
