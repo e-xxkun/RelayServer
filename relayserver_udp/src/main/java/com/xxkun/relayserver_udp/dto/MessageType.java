@@ -4,7 +4,9 @@ import com.xxkun.relayserver_udp.dao.Message;
 import com.xxkun.relayserver_udp.dao.UDPField;
 import com.xxkun.relayserver_udp.dao.message.HeartbeatMessage;
 
-public enum  MessageType {
+public enum  MessageType implements IMessageType {
+
+
 
     LOGIN(0L, " "),
     LOGOUT(1, " "),
@@ -28,21 +30,23 @@ public enum  MessageType {
         this.info = info;
     }
 
-    public static MessageType fromTypeValue(int type) {
-        if (type < 0 || type > MessageType.values().length) {
-            return UNKNOWN;
+    static {
+        for (MessageType type : MessageType.values()) {
+            typeMap.put(type.code, type);
         }
-        return MessageType.values()[type];
     }
 
+    @Override
     public String getInfo() {
         return info;
     }
 
+    @Override
     public long getCode() {
         return code;
     }
 
+    @Override
     public Message createMessage(UDPField udpField) {
         return null;
     }

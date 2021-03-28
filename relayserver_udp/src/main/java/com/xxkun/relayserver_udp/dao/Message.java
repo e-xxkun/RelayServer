@@ -1,5 +1,6 @@
 package com.xxkun.relayserver_udp.dao;
 
+import com.xxkun.relayserver_udp.dto.IMessageType;
 import com.xxkun.relayserver_udp.dto.MessageType;
 import reactor.util.annotation.NonNull;
 
@@ -40,6 +41,9 @@ public abstract class Message {
             return null;
         ByteBuffer buffer = udpField.getByteBuffer();
         int type = buffer.getInt();
-        return MessageType.fromTypeValue(type).createMessage(udpField);
+        IMessageType messageType = IMessageType.fromTypeCode(type);
+        if (messageType == null)
+            return null;
+        return messageType.createMessage(udpField);
     }
 }
