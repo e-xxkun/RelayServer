@@ -1,12 +1,10 @@
 package com.xxkun.relayserver_udp.dao;
 
-import com.xxkun.relayserver_udp.dto.IMessageType;
 import com.xxkun.relayserver_udp.dto.MessageType;
 import reactor.util.annotation.NonNull;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
+import java.nio.ByteBuffer;
 
 public abstract class Message {
 
@@ -33,22 +31,15 @@ public abstract class Message {
 
     public abstract UDPField convertToUDPField();
 
-    public InetSocketAddress getSocketAddress(){
-        return udpField.getSocketAddress();
-    }
-
-    public boolean isACK() {
-        return udpField.isACK();
-    }
-
     public abstract String getToken();
 
     public abstract MessageType getType();
 
-    public static Message decodeFromByteArray(byte[] bytes, InetSocketAddress socketAddress) {
-        UDPField udpField = UDPField.decodeFromByteArray(bytes, socketAddress);
+    public static Message decodeFromUDPField(UDPField udpField) {
         if (udpField == null)
             return null;
-        return null;
+        ByteBuffer buffer = udpField.getByteBuffer();
+        int type = buffer.getInt();
+        return MessageType.fromTypeValue(type).createMessage(udpField);
     }
 }

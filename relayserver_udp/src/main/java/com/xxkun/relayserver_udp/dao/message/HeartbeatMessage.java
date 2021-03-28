@@ -1,8 +1,8 @@
-package com.xxkun.relayserver_udp.dao;
+package com.xxkun.relayserver_udp.dao.message;
 
+import com.xxkun.relayserver_udp.dao.Message;
+import com.xxkun.relayserver_udp.dao.UDPField;
 import com.xxkun.relayserver_udp.dto.MessageType;
-
-import java.net.InetSocketAddress;
 
 public class HeartbeatMessage extends Message {
 

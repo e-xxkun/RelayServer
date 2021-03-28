@@ -1,5 +1,6 @@
 package com.xxkun.relayserver_udp.dao;
 
+import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Date;
@@ -30,13 +31,14 @@ public class UDPField implements Delayed {
 
     private final Integer bodyLength;
 
-    private String body;
+    private byte[] body;
 
     private final String id;
 
     private int resendTime = 0;
 
-    public UDPField(Long seq, Integer clientVersion, Integer cmdId, Integer rtt, Integer bodyLength, InetSocketAddress socketAddress) {
+    public UDPField(byte[] body, Long seq, Integer clientVersion, Integer cmdId, Integer rtt, Integer bodyLength, InetSocketAddress socketAddress) {
+        this.body = body;
         this.seq = seq;
         this.socketAddress = socketAddress;
         this.rtt = rtt;
@@ -135,7 +137,15 @@ public class UDPField implements Delayed {
 
         int bodyLength = buffer.getInt();
 
-        return new UDPField(seq, clientVersion, cmdId, rtt, bodyLength, socketAddress);
+        return new UDPField(bytes, seq, clientVersion, cmdId, rtt, bodyLength, socketAddress);
+    }
+
+    public DatagramPacket encodeToDatagramPacket() {
+        return null;
+    }
+
+    public ByteBuffer getByteBuffer() {
+        return ByteBuffer.wrap(body, HEAD_LEN, bodyLength);
     }
 
     public enum UDPFieldType {

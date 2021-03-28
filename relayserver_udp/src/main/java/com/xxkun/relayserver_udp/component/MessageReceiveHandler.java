@@ -2,6 +2,7 @@ package com.xxkun.relayserver_udp.component;
 
 import com.xxkun.relayserver_udp.component.handler.ACKMsgHandler;
 import com.xxkun.relayserver_udp.dao.Message;
+import com.xxkun.relayserver_udp.dao.UDPField;
 import com.xxkun.relayserver_udp.dao.UserSession;
 import com.xxkun.relayserver_udp.service.UserInfoManageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,13 @@ public class MessageReceiveHandler implements MessageListener.OnMessage {
     private IMsgQueue msgQueueSender;
 
     @Override
-    public void onMessage(SocketAddress from, Message msg) {
-        if (msg.isACK()) {
-            ackMsgHandler.consume(msg);
+    public void onMessage(SocketAddress from, UDPField udpField) {
+        if (udpField.isACK()) {
+//            ackMsgHandler.consume(udpField);
+            return;
+        }
+        Message msg = Message.decodeFromUDPField(udpField);
+        if (msg == null) {
             return;
         }
         UserSession userSession = userInfoManageService.getUserSessionFromToken(msg.getToken());
