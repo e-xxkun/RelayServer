@@ -31,14 +31,14 @@ public class UDPField implements Delayed {
 
     private final Integer bodyLength;
 
-    private byte[] body;
+    private BodyBuffer bodyBuffer;
 
     private final String id;
 
     private int resendTime = 0;
 
-    public UDPField(byte[] body, Long seq, Integer clientVersion, Integer cmdId, Integer rtt, Integer bodyLength, InetSocketAddress socketAddress) {
-        this.body = body;
+    public UDPField(ByteBuffer buffer, Long seq, Integer clientVersion, Integer cmdId, Integer rtt, Integer bodyLength, InetSocketAddress socketAddress) {
+        this.bodyBuffer = new BodyBuffer(buffer);
         this.seq = seq;
         this.socketAddress = socketAddress;
         this.rtt = rtt;
@@ -137,15 +137,44 @@ public class UDPField implements Delayed {
 
         int bodyLength = buffer.getInt();
 
-        return new UDPField(bytes, seq, clientVersion, cmdId, rtt, bodyLength, socketAddress);
+        return new UDPField(buffer, seq, clientVersion, cmdId, rtt, bodyLength, socketAddress);
     }
 
     public DatagramPacket encodeToDatagramPacket() {
         return null;
     }
 
-    public ByteBuffer getByteBuffer() {
-        return ByteBuffer.wrap(body, HEAD_LEN, bodyLength);
+    public BodyBuffer getByteBuffer() {
+        return bodyBuffer;
+    }
+
+    public class BodyBuffer {
+
+        private ByteBuffer byteBuffer;
+
+        public BodyBuffer(ByteBuffer byteBuffer) {
+            this.byteBuffer = byteBuffer;
+        }
+
+        public int getInt() {
+            return bodyBuffer.getInt();
+        }
+
+        public void skip(int length) {
+            byteBuffer.position(byteBuffer.position() + length);
+        }
+
+        public void reset() {
+            byteBuffer.position(HEAD_LEN);
+        }
+
+        public String getString(int length) {
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0;i < length;i ++) {
+                builder.append(byteBuffer.getChar());
+            }
+            return builder.toString();
+        }
     }
 
     public enum UDPFieldType {

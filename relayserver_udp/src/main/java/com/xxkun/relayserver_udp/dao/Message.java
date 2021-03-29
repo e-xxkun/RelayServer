@@ -10,11 +10,33 @@ import java.nio.ByteBuffer;
 public abstract class Message {
 
     public static final int UDP_MSG_IN_BUFF_LEN = 512;
-    
-    private final UDPField udpField;
+
+    public static final int MESSAGE_TOKEN_LEN = 16;
+
+    protected final UDPField udpField;
 
     public Message(@NonNull UDPField udpField) {
         this.udpField = udpField;
+        decode(udpField);
+    }
+
+    public abstract UDPField convertToUDPField();
+
+    public abstract String getToken();
+
+    public abstract MessageType getType();
+
+    protected abstract void decode(UDPField udpField);
+
+    public static Message decodeFromUDPField(UDPField udpField) {
+        if (udpField == null)
+            return null;
+        UDPField.BodyBuffer buffer = udpField.getByteBuffer();
+        int type = buffer.getInt();
+        IMessageType messageType = IMessageType.fromTypeCode(type);
+        if (messageType == null)
+            return null;
+        return messageType.createMessage(udpField);
     }
 
     @Override
@@ -30,20 +52,4 @@ public abstract class Message {
         return udpField.hashCode();
     }
 
-    public abstract UDPField convertToUDPField();
-
-    public abstract String getToken();
-
-    public abstract MessageType getType();
-
-    public static Message decodeFromUDPField(UDPField udpField) {
-        if (udpField == null)
-            return null;
-        ByteBuffer buffer = udpField.getByteBuffer();
-        int type = buffer.getInt();
-        IMessageType messageType = IMessageType.fromTypeCode(type);
-        if (messageType == null)
-            return null;
-        return messageType.createMessage(udpField);
-    }
 }
