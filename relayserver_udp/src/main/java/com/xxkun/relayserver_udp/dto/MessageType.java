@@ -3,24 +3,24 @@ package com.xxkun.relayserver_udp.dto;
 import com.xxkun.relayserver_udp.dao.Message;
 import com.xxkun.relayserver_udp.dao.UDPField;
 import com.xxkun.relayserver_udp.dao.message.HeartbeatMessage;
+import com.xxkun.relayserver_udp.dao.message.PunchMessage;
 
 public enum  MessageType implements IMessageType {
 
-
-
-    LOGIN(0L, " "),
-    LOGOUT(1, " "),
-    LIST(2, ""),
-    PUNCH(3, ""),
-    HEARTBEAT(4, " "){
+    PUNCH(3, "") {
+        @Override
+        public Message createMessage(UDPField udpField) {
+            return new PunchMessage(udpField);
+        }
+    },
+    HEARTBEAT(4, ""){
         @Override
         public Message createMessage(UDPField udpField) {
             return new HeartbeatMessage(udpField);
         }
     },
     REPLY(5, ""),
-    TEXT(6, " "),
-    UNKNOWN(7, " ");
+    UNKNOWN(7, "");
 
     private final long code;
     private final String info;

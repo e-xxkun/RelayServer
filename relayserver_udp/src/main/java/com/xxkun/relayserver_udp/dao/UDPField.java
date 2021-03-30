@@ -1,5 +1,7 @@
 package com.xxkun.relayserver_udp.dao;
 
+import org.springframework.lang.NonNull;
+
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -29,22 +31,19 @@ public class UDPField implements Delayed {
 
     private final Integer clientVersion;
 
-    private final Integer bodyLength;
-
     private BodyBuffer bodyBuffer;
 
     private final String id;
 
     private int resendTime = 0;
 
-    public UDPField(ByteBuffer buffer, Long seq, Integer clientVersion, Integer cmdId, Integer rtt, Integer bodyLength, InetSocketAddress socketAddress) {
-        this.bodyBuffer = new BodyBuffer(buffer);
+    private UDPField(ByteBuffer buffer, Long seq, Integer clientVersion, Integer cmdId, Integer rtt, Integer bodyLength, @NonNull InetSocketAddress socketAddress) {
+        this.bodyBuffer = new BodyBuffer(buffer, bodyLength);
         this.seq = seq;
         this.socketAddress = socketAddress;
         this.rtt = rtt;
         this.type = UDPFieldType.valueOf(cmdId);
         this.clientVersion = clientVersion;
-        this.bodyLength = bodyLength;
         this.id = this.socketAddress.toString() + this.seq;
     }
 
@@ -62,10 +61,6 @@ public class UDPField implements Delayed {
 
     public Integer getClientVersion() {
         return clientVersion;
-    }
-
-    public Integer getBodyLength() {
-        return bodyLength;
     }
 
     public long getSendDate() {
@@ -141,7 +136,8 @@ public class UDPField implements Delayed {
     }
 
     public DatagramPacket encodeToDatagramPacket() {
-        return null;
+        byte[] body = bodyBuffer.getByteArray();
+        return new DatagramPacket(body, body.length, socketAddress);
     }
 
     public BodyBuffer getByteBuffer() {
@@ -150,18 +146,29 @@ public class UDPField implements Delayed {
 
     public class BodyBuffer {
 
+        private int bodyLength;
+
         private ByteBuffer byteBuffer;
 
-        public BodyBuffer(ByteBuffer byteBuffer) {
+        public BodyBuffer(ByteBuffer byteBuffer, Integer bodyLength) {
             this.byteBuffer = byteBuffer;
+            this.bodyLength = bodyLength;
         }
 
         public int getInt() {
             return bodyBuffer.getInt();
         }
 
-        public void skip(int length) {
+        public boolean skip(int length) {
+            if (length > getRemainLength()) {
+                return false;
+            }
             byteBuffer.position(byteBuffer.position() + length);
+            return true;
+        }
+
+        public int getRemainLength() {
+            return HEAD_LEN + bodyLength - byteBuffer.position();
         }
 
         public void reset() {
@@ -175,16 +182,23 @@ public class UDPField implements Delayed {
             }
             return builder.toString();
         }
+
+        public byte[] getByteArray() {
+            return byteBuffer.array();
+        }
     }
 
     public enum UDPFieldType {
-        ACK(0){
+        ACK(0) {
             @Override
             public boolean isACK() {
                 return true;
             }
         },
-        UNKNOWN(1);
+        PUT(1),
+        GET(2),
+        REPLY(3),
+        UNKNOWN(4);
 
         private final int cmdId;
 

@@ -2,10 +2,7 @@ package com.xxkun.relayserver_udp.dao;
 
 import com.xxkun.relayserver_udp.dto.IMessageType;
 import com.xxkun.relayserver_udp.dto.MessageType;
-import reactor.util.annotation.NonNull;
-
-import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
+import org.springframework.lang.NonNull;
 
 public abstract class Message {
 
@@ -22,7 +19,9 @@ public abstract class Message {
 
     public abstract UDPField convertToUDPField();
 
-    public abstract String getToken();
+    public String getToken() {
+        return null;
+    }
 
     public abstract MessageType getType();
 

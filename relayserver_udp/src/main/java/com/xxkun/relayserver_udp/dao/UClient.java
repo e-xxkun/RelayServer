@@ -15,7 +15,7 @@ public class UClient {
 
     public UClient(InetSocketAddress socketAddress) {
         this.socketAddress = socketAddress;
-        this.curSeq = new AtomicLong(new Random().nextLong()%256);
+        this.curSeq = new AtomicLong(new Random().nextLong() % 256);
         msgSet = new HashSet<>();
     }
 
