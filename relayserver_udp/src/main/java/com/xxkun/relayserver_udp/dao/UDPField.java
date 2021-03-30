@@ -110,10 +110,6 @@ public class UDPField implements Delayed {
         return resendTime > 0;
     }
 
-    public boolean isACK() {
-        return type.isACK();
-    }
-
     public static UDPField decodeFromByteArray(byte[] bytes, InetSocketAddress socketAddress) {
         if (bytes.length < HEAD_LEN)
             return null;
@@ -195,8 +191,18 @@ public class UDPField implements Delayed {
                 return true;
             }
         },
-        PUT(1),
-        GET(2),
+        PUT(1) {
+            @Override
+            public boolean isPUT() {
+                return true;
+            }
+        },
+        GET(2) {
+            @Override
+            public boolean isGET() {
+                return true;
+            }
+        },
         REPLY(3),
         UNKNOWN(4);
 
@@ -218,6 +224,14 @@ public class UDPField implements Delayed {
         }
 
         public boolean isACK() {
+            return false;
+        }
+
+        public boolean isPUT() {
+            return false;
+        }
+
+        public boolean isGET() {
             return false;
         }
     }

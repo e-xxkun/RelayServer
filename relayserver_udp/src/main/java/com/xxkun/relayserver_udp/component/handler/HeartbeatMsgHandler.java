@@ -4,7 +4,7 @@ import com.xxkun.relayserver_udp.dao.Message;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HeartbeatMsgHandler implements IHandler{
+public class HeartbeatMsgHandler implements IMessageHandler {
     @Override
     public void consume(Message msg) {
 

@@ -1,7 +1,7 @@
-package com.xxkun.relayserver_udp.component;
+package com.xxkun.relayserver_udp.component.queue;
 
+import com.xxkun.relayserver_udp.component.BaseThread;
 import com.xxkun.relayserver_udp.dao.Message;
-import com.xxkun.relayserver_udp.dao.UMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Component
-public class MsgQueue implements IMsgQueue {
+public class GetMsgQueue implements IMsgQueue {
     @Autowired
     private OnMessage onMessage;
     @Resource(name = "msgSendThreadPool")
@@ -20,7 +20,7 @@ public class MsgQueue implements IMsgQueue {
 
     private final MsgListenThread msgListenThread;
 
-    public MsgQueue() {
+    public GetMsgQueue() {
         queue = new LinkedBlockingQueue<>();
         msgListenThread = new MsgListenThread();
         msgListenThread.start();

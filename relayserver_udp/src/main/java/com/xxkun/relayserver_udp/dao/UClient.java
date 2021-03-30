@@ -2,12 +2,14 @@ package com.xxkun.relayserver_udp.dao;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class UClient {
-    private Set<UDPField> msgSet;
+    private Map<UDPField, Object> msgSet;
 
     private InetSocketAddress socketAddress;
 
@@ -16,11 +18,11 @@ public class UClient {
     public UClient(InetSocketAddress socketAddress) {
         this.socketAddress = socketAddress;
         this.curSeq = new AtomicLong(new Random().nextLong() % 256);
-        msgSet = new HashSet<>();
+        msgSet = new ConcurrentHashMap<>();
     }
 
     public void addUDPMsg(UDPField udpMsg) {
-        msgSet.add(udpMsg);
+        msgSet.put(udpMsg, null);
     }
 
     public boolean removeMessage(UDPField udpMsg) {
@@ -28,7 +30,7 @@ public class UClient {
     }
 
     public boolean containsMessage(UDPField udpMsg) {
-        return true;
+        return msgSet.containsKey(udpMsg);
     }
 
     public long getCurSeq() {

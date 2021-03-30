@@ -1,4 +1,4 @@
-package com.xxkun.relayserver_udp.component;
+package com.xxkun.relayserver_udp.component.queue;
 
 import com.xxkun.relayserver_udp.dao.Message;
 
