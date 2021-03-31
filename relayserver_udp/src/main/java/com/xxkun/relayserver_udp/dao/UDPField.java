@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
-public class UDPField implements Delayed {
+public final class UDPField implements Delayed {
 
     public static final int UDP_MSG_MAX_LEN = 512;
 
@@ -60,6 +60,14 @@ public class UDPField implements Delayed {
         return receiveDate;
     }
 
+    public void setSendDate(Date sendDate) {
+        this.sendDate = sendDate;
+    }
+
+    public void setReceiveDate(Date receiveDate) {
+        this.receiveDate = receiveDate;
+    }
+
     public UDPFieldType getType() {
         return type;
     }
@@ -69,7 +77,10 @@ public class UDPField implements Delayed {
     }
 
     public long getSendDate() {
-        return sendDate.getTime();
+        if (sendDate != null)
+            return sendDate.getTime();
+        else
+            return 0;
     }
 
     @Override

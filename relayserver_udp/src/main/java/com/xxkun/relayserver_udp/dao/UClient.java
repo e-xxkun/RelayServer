@@ -9,11 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class UClient {
-    private Map<UDPField, Object> msgSet;
+    private final Map<UDPField, Object> msgSet;
 
-    private InetSocketAddress socketAddress;
+    private final InetSocketAddress socketAddress;
 
-    private AtomicLong curSeq;
+    private final AtomicLong curSeq;
 
     public UClient(InetSocketAddress socketAddress) {
         this.socketAddress = socketAddress;

@@ -11,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Date;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Component
@@ -37,10 +38,10 @@ public class MessageListener extends BaseThread {
                 UDPField udpField;
                 try {
                     udpField = UDPField.decodeFromByteArray(packet.getData(), (InetSocketAddress)packet.getSocketAddress());
+                    udpField.setReceiveDate(new Date());
                     onMessage.onMessage(packet.getSocketAddress(), udpField);
                 } catch (UDPFieldResolutionException e) {
                     System.out.println("Invalid message from " + packet.getSocketAddress() + ":" + new String(packet.getData()));
-                    e.printStackTrace();
                 }
             });
         }

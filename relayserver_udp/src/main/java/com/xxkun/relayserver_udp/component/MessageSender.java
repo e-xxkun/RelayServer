@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Date;
 
 @Component
 public class MessageSender implements MessageCache.OnMsgTimeout{
@@ -19,6 +20,7 @@ public class MessageSender implements MessageCache.OnMsgTimeout{
 
     public void send(UDPField udpField) {
         try {
+            udpField.setSendDate(new Date());
             messageCache.addToCache(udpField);
             DatagramPacket packet = udpField.encodeToDatagramPacket();
             if (packet == null) {
