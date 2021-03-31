@@ -1,5 +1,6 @@
 package com.xxkun.relayserver_udp.dao;
 
+import com.xxkun.relayserver_udp.component.exception.UDPFieldResolutionException;
 import org.springframework.lang.NonNull;
 
 import java.net.DatagramPacket;
@@ -11,11 +12,15 @@ import java.util.concurrent.TimeUnit;
 
 public class UDPField implements Delayed {
 
+    public static final int UDP_MSG_MAX_LEN = 512;
+
     private static final int MAX_RESEND_TIME = 4;
 
     public static final int HEAD = 0xFEFDDFEB;
 
-    public static final int HEAD_LEN = 28;
+    public static final int HEAD_LEN = 5 * Integer.BYTES + Long.BYTES;
+
+    public static final int RTT_MAX = 2 * 1000;
 
     private Long seq;
 
@@ -31,7 +36,7 @@ public class UDPField implements Delayed {
 
     private final Integer clientVersion;
 
-    private BodyBuffer bodyBuffer;
+    private final BodyBuffer bodyBuffer;
 
     private final String id;
 
@@ -110,21 +115,21 @@ public class UDPField implements Delayed {
         return resendTime > 0;
     }
 
-    public static UDPField decodeFromByteArray(byte[] bytes, InetSocketAddress socketAddress) {
+    public static UDPField decodeFromByteArray(@NonNull byte[] bytes, InetSocketAddress socketAddress) throws UDPFieldResolutionException {
         if (bytes.length < HEAD_LEN)
-            return null;
+            throw new UDPFieldResolutionException();
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         if (buffer.getInt() != HEAD)
-            return null;
+            throw new UDPFieldResolutionException();
         long seq = buffer.getLong();
 
         int clientVersion = buffer.getInt();
 
         int cmdId = buffer.getInt();
-        if (cmdId >= UDPFieldType.values().length)
-            return null;
+        if (cmdId < 0 || cmdId >= UDPFieldType.values().length - 1)
+            throw new UDPFieldResolutionException();
 
-        int rtt = buffer.getInt();
+        int rtt = Math.max(buffer.getInt(), RTT_MAX);
 
         int bodyLength = buffer.getInt();
 

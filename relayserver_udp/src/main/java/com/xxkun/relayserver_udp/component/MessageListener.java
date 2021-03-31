@@ -1,7 +1,6 @@
 package com.xxkun.relayserver_udp.component;
 
-import com.xxkun.relayserver_udp.common.utils.MessageUtil;
-import com.xxkun.relayserver_udp.dao.Message;
+import com.xxkun.relayserver_udp.component.exception.UDPFieldResolutionException;
 import com.xxkun.relayserver_udp.dao.UDPField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,7 +25,7 @@ public class MessageListener extends BaseThread {
     @Override
     public void run() {
         while (!stop) {
-            byte[] inBuff = new byte[Message.UDP_MSG_IN_BUFF_LEN];
+            byte[] inBuff = new byte[UDPField.UDP_MSG_MAX_LEN];
             DatagramPacket packet = new DatagramPacket(inBuff, inBuff.length);
             try {
                 socket.receive(packet);
@@ -35,11 +34,14 @@ public class MessageListener extends BaseThread {
                 continue;
             }
             msgReceiveThreadPool.execute(() -> {
-                UDPField udpField = UDPField.decodeFromByteArray(packet.getData(), (InetSocketAddress)packet.getSocketAddress());
-                if (udpField == null) {
+                UDPField udpField;
+                try {
+                    udpField = UDPField.decodeFromByteArray(packet.getData(), (InetSocketAddress)packet.getSocketAddress());
+                    onMessage.onMessage(packet.getSocketAddress(), udpField);
+                } catch (UDPFieldResolutionException e) {
                     System.out.println("Invalid message from " + packet.getSocketAddress() + ":" + new String(packet.getData()));
+                    e.printStackTrace();
                 }
-                onMessage.onMessage(packet.getSocketAddress(), udpField);
             });
         }
     }

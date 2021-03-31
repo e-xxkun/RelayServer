@@ -1,5 +1,6 @@
 package com.xxkun.relayserver_udp.dao.message;
 
+import com.xxkun.relayserver_udp.component.exception.MessageResolutionException;
 import com.xxkun.relayserver_udp.dao.Message;
 import com.xxkun.relayserver_udp.dao.UDPField;
 import com.xxkun.relayserver_udp.dto.MessageType;
@@ -8,7 +9,7 @@ public class HeartbeatMessage extends Message {
 
     private String token;
 
-    public HeartbeatMessage(UDPField udpField) {
+    public HeartbeatMessage(UDPField udpField) throws MessageResolutionException {
         super(udpField);
     }
 
@@ -17,8 +18,8 @@ public class HeartbeatMessage extends Message {
     }
 
     @Override
-    public UDPField convertToUDPField() {
-        return null;
+    public void overwriteToUDPField(UDPField udpField) {
+
     }
 
     @Override

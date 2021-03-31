@@ -1,5 +1,6 @@
 package com.xxkun.relayserver_udp.dto;
 
+import com.xxkun.relayserver_udp.component.exception.MessageResolutionException;
 import com.xxkun.relayserver_udp.dao.Message;
 import com.xxkun.relayserver_udp.dao.UDPField;
 
@@ -17,5 +18,5 @@ public interface IMessageType {
 
     long getCode();
 
-    Message createMessage(UDPField udpField);
+    Message createMessage(UDPField udpField) throws MessageResolutionException;
 }

@@ -1,23 +1,27 @@
 package com.xxkun.relayserver_udp.dao;
 
+import com.xxkun.relayserver_udp.component.exception.MessageResolutionException;
 import com.xxkun.relayserver_udp.dto.IMessageType;
 import com.xxkun.relayserver_udp.dto.MessageType;
 import org.springframework.lang.NonNull;
 
 public abstract class Message {
 
-    public static final int UDP_MSG_IN_BUFF_LEN = 512;
-
     public static final int MESSAGE_TOKEN_LEN = 16;
 
-    protected final UDPField udpField;
+    private final UDPField udpField;
 
-    public Message(@NonNull UDPField udpField) {
+    public Message(@NonNull UDPField udpField) throws MessageResolutionException {
         this.udpField = udpField;
         decode(udpField);
     }
 
-    public abstract UDPField convertToUDPField();
+    public UDPField convertToUDPField() {
+        overwriteToUDPField(udpField);
+        return udpField;
+    }
+
+    public abstract void overwriteToUDPField(UDPField udpField);
 
     public String getToken() {
         return null;
@@ -25,17 +29,21 @@ public abstract class Message {
 
     public abstract MessageType getType();
 
-    protected abstract void decode(UDPField udpField);
+    protected abstract void decode(UDPField udpField) throws MessageResolutionException;
 
-    public static Message decodeFromUDPField(UDPField udpField) {
-        if (udpField == null)
-            return null;
+    public static Message decodeFromUDPField(@NonNull UDPField udpField) {
         UDPField.BodyBuffer buffer = udpField.getByteBuffer();
         int type = buffer.getInt();
         IMessageType messageType = IMessageType.fromTypeCode(type);
         if (messageType == null)
             return null;
-        return messageType.createMessage(udpField);
+        Message message = null;
+        try {
+            message = messageType.createMessage(udpField);
+        } catch (MessageResolutionException e) {
+            e.printStackTrace();
+        }
+        return message;
     }
 
     @Override

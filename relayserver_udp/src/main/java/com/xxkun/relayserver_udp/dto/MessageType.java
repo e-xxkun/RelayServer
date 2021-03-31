@@ -1,5 +1,6 @@
 package com.xxkun.relayserver_udp.dto;
 
+import com.xxkun.relayserver_udp.component.exception.MessageResolutionException;
 import com.xxkun.relayserver_udp.dao.Message;
 import com.xxkun.relayserver_udp.dao.UDPField;
 import com.xxkun.relayserver_udp.dao.message.HeartbeatMessage;
@@ -9,13 +10,13 @@ public enum  MessageType implements IMessageType {
 
     PUNCH(3, "") {
         @Override
-        public Message createMessage(UDPField udpField) {
+        public Message createMessage(UDPField udpField) throws MessageResolutionException {
             return new PunchMessage(udpField);
         }
     },
     HEARTBEAT(4, ""){
         @Override
-        public Message createMessage(UDPField udpField) {
+        public Message createMessage(UDPField udpField) throws MessageResolutionException {
             return new HeartbeatMessage(udpField);
         }
     },
@@ -47,7 +48,7 @@ public enum  MessageType implements IMessageType {
     }
 
     @Override
-    public Message createMessage(UDPField udpField) {
+    public Message createMessage(UDPField udpField) throws MessageResolutionException {
         return null;
     }
 }
