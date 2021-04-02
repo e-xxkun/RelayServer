@@ -4,10 +4,10 @@ import com.xxkun.relayserver.component.exception.MessageResolutionException;
 import com.xxkun.relayserver.component.handler.HeartbeatMessageHandler;
 import com.xxkun.relayserver.component.handler.IMessageHandler;
 import com.xxkun.relayserver.component.handler.PunchMessageHandler;
-import com.xxkun.relayserver.dao.Message;
-import com.xxkun.relayserver.dao.Request;
-import com.xxkun.relayserver.dao.message.HeartbeatMessage;
-import com.xxkun.relayserver.dao.message.PunchMessage;
+import com.xxkun.relayserver.dao.request.Message;
+import com.xxkun.relayserver.dao.request.Request;
+import com.xxkun.relayserver.dao.request.message.HeartbeatMessage;
+import com.xxkun.relayserver.dao.request.message.PunchMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public enum  MessageType implements IMessageType {

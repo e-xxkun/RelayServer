@@ -1,6 +1,6 @@
 package com.xxkun.relayserver.component.queue;
 
-import com.xxkun.relayserver.dao.Message;
+import com.xxkun.relayserver.dao.request.Message;
 
 public interface IMessageQueue {
 

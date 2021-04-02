@@ -1,16 +1,19 @@
-package com.xxkun.relayserver.component.handler;
+package com.xxkun.relayserver.receive;
 
+import com.xxkun.relayserver.send.ACKHandler;
 import com.xxkun.relayserver.component.queue.IMessageQueue;
-import com.xxkun.relayserver.dao.Message;
-import com.xxkun.relayserver.dao.Request;
+import com.xxkun.relayserver.dao.request.Message;
+import com.xxkun.relayserver.dao.request.Request;
 import com.xxkun.relayserver.dao.UserSession;
 import com.xxkun.relayserver.service.UserInfoManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.net.SocketAddress;
+
 @Component
-public class RequestHandler implements IRequestHandler {
+public class RequestHandler implements RequestListener.OnRequest {
     @Autowired
     private UserInfoManageService userInfoManageService;
     @Qualifier("putMessageQueue")
@@ -19,9 +22,18 @@ public class RequestHandler implements IRequestHandler {
     @Qualifier("getMessageQueue")
     @Autowired
     private IMessageQueue getMsgQueueSender;
-    
+    @Autowired
+    private RequestHandler requestHandler;
+    @Autowired
+    private ACKHandler ackHandler;
+
     @Override
-    public void consume(Request request) {
+    public void onRequest(SocketAddress from, Request request) {
+        if (request.getType().isACK()) {
+            ackHandler.consume(request);
+            return;
+        }
+
         Message message = Message.decodeFromRequest(request);
         if (message == null) {
             return;

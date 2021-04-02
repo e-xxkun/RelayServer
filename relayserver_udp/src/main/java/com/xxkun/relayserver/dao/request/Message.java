@@ -1,4 +1,4 @@
-package com.xxkun.relayserver.dao;
+package com.xxkun.relayserver.dao.request;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
 import com.xxkun.relayserver.dto.IMessageType;

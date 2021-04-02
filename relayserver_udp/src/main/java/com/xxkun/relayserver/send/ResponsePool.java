@@ -1,6 +1,7 @@
-package com.xxkun.relayserver.component;
+package com.xxkun.relayserver.send;
 
-import com.xxkun.relayserver.dao.Response;
+import com.xxkun.relayserver.component.BaseThread;
+import com.xxkun.relayserver.dao.response.Response;
 import com.xxkun.relayserver.dao.UserClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

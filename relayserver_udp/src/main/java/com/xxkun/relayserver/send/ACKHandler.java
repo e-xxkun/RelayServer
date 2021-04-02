@@ -1,18 +1,21 @@
-package com.xxkun.relayserver.component.handler;
+package com.xxkun.relayserver.send;
 
-import com.xxkun.relayserver.component.ResponsePool;
-import com.xxkun.relayserver.dao.Request;
+import com.xxkun.relayserver.send.ResponsePool;
+import com.xxkun.relayserver.dao.request.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ACKHandler implements IRequestHandler {
+public class ACKHandler {
     @Autowired
     private ResponsePool responsePool;
 
-    @Override
     public void consume(Request request) {
 //        TODO
 //        responsePool.ack(request);
+    }
+
+    public void reply(Request request) {
+
     }
 }

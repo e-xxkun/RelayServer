@@ -1,8 +1,8 @@
-package com.xxkun.relayserver.component;
+package com.xxkun.relayserver.send;
 
 import com.xxkun.relayserver.component.handler.IMessageHandler;
 import com.xxkun.relayserver.component.queue.IMessageQueue;
-import com.xxkun.relayserver.dao.Message;
+import com.xxkun.relayserver.dao.request.Message;
 import org.springframework.stereotype.Component;
 
 @Component

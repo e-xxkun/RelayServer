@@ -1,15 +1,12 @@
-package com.xxkun.relayserver.dao;
+package com.xxkun.relayserver.dao.response;
 
-import org.springframework.lang.NonNull;
-
-import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
-public final class Response implements Delayed {
+public abstract class Response implements Delayed {
 
     public static final int UDP_MSG_MAX_LEN = 512;
 
@@ -20,7 +17,7 @@ public final class Response implements Delayed {
 //    HEAD|sequence|cmdId|bodyLength  ->  int|long|int|int
     private static final int HEAD_LEN = 3 * Integer.BYTES + Long.BYTES;
 
-    private Long sequence;
+    private long sequence;
 
     private Date sendDate;
 
@@ -28,15 +25,16 @@ public final class Response implements Delayed {
 
     private ResponseType type;
 
-    private final BodyBuffer bodyBuffer;
+    protected final BodyBuffer bodyBuffer;
 
     private String id;
 
     private int resendTime = 0;
 
-    public Response() {
+    public Response(InetSocketAddress socketAddress) {
         bodyBuffer = new BodyBuffer();
         bodyBuffer.writeInt(HEAD);
+        setSocketAddress(socketAddress);
     }
 
     public void setSendDate(Date sendDate) {
@@ -50,11 +48,8 @@ public final class Response implements Delayed {
             return 0;
     }
 
-    public void setSequence(Long sequence) {
+    public void setSequence(long sequence) {
         this.sequence = sequence;
-        int curIndex = bodyBuffer.byteBuffer.position();
-        bodyBuffer.byteBuffer.putLong(Integer.BYTES, sequence);
-        bodyBuffer.byteBuffer.position(curIndex);
         refreshId();
     }
 
@@ -67,15 +62,8 @@ public final class Response implements Delayed {
         refreshId();
     }
 
-    public ResponseType getType() {
-        return type;
-    }
-
     public void setType(ResponseType type) {
         this.type = type;
-        int curIndex = bodyBuffer.position();
-        bodyBuffer.byteBuffer.putInt(Integer.BYTES + Long.BYTES, type.getCmdId());
-        bodyBuffer.position(curIndex);
     }
 
     public void incResendTime() {
@@ -92,7 +80,10 @@ public final class Response implements Delayed {
 
     public byte[] convertToByteArray() {
         int curIndex = bodyBuffer.position();
-        bodyBuffer.byteBuffer.putInt(2 * Integer.BYTES + Long.BYTES, bodyBuffer.getBodyLength());
+        bodyBuffer.byteBuffer.position(Integer.BYTES);
+        bodyBuffer.byteBuffer.putLong(sequence);
+        bodyBuffer.byteBuffer.putInt(getType().getCmdId());
+        bodyBuffer.byteBuffer.putInt(getBodyLength());
         bodyBuffer.position(curIndex);
         return bodyBuffer.byteBuffer.array();
     }
@@ -102,10 +93,12 @@ public final class Response implements Delayed {
         if (socketAddress != null) {
             id += socketAddress.toString();
         }
-        if (sequence != null) {
-            id += sequence;
-        }
+        id += sequence;
     }
+
+    public abstract int getBodyLength();
+
+    public abstract ResponseType getType();
 
     @Override
     public long getDelay(TimeUnit unit) {
@@ -130,30 +123,20 @@ public final class Response implements Delayed {
         return id.hashCode();
     }
 
-    public BodyBuffer getByteBuffer() {
-        return bodyBuffer;
-    }
-
     public class BodyBuffer {
 
-        private ByteBuffer byteBuffer;
-        private int bodyLength;
+        private final ByteBuffer byteBuffer;
 
         public BodyBuffer() {
             byteBuffer = ByteBuffer.allocate(UDP_MSG_MAX_LEN);
         }
 
         public void skip(int length) {
-            byteBuffer.position(byteBuffer.position() + length);
-        }
-
-        public void reset() {
-            byteBuffer.position(HEAD_LEN);
+            position(position() + length);
         }
 
         public void writeInt(int value) {
             byteBuffer.putInt(value);
-            bodyLength = Math.max(bodyLength, position());
         }
 
         public void position(int index) {
@@ -169,18 +152,17 @@ public final class Response implements Delayed {
             for (int i = 0;i < value.length();i ++) {
                 byteBuffer.putChar(value.charAt(i));
             }
-            bodyLength = Math.max(bodyLength, position());
         }
 
-        public int getBodyLength() {
-            return bodyLength;
+        public int limit() {
+            return UDP_MSG_MAX_LEN - HEAD_LEN;
         }
     }
 
     public enum ResponseType {
-
-        REPLY(0),
-        UNKNOWN(1);
+        ACK(0),
+        REPLY(1),
+        PUNCH(2);
 
         private final int cmdId;
 

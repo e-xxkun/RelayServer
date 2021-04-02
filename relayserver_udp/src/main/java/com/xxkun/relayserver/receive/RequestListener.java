@@ -1,7 +1,8 @@
-package com.xxkun.relayserver.component;
+package com.xxkun.relayserver.receive;
 
+import com.xxkun.relayserver.component.BaseThread;
 import com.xxkun.relayserver.component.exception.RequestResolutionException;
-import com.xxkun.relayserver.dao.Request;
+import com.xxkun.relayserver.dao.request.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

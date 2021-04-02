@@ -2,8 +2,8 @@ package com.xxkun.relayserver.dto;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
 import com.xxkun.relayserver.component.handler.IMessageHandler;
-import com.xxkun.relayserver.dao.Message;
-import com.xxkun.relayserver.dao.Request;
+import com.xxkun.relayserver.dao.request.Message;
+import com.xxkun.relayserver.dao.request.Request;
 
 import java.util.HashMap;
 

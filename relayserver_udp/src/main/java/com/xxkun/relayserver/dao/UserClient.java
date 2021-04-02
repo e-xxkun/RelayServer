@@ -1,5 +1,7 @@
 package com.xxkun.relayserver.dao;
 
+import com.xxkun.relayserver.dao.response.Response;
+
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Random;

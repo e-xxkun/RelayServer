@@ -1,8 +1,8 @@
-package com.xxkun.relayserver.dao.message;
+package com.xxkun.relayserver.dao.request.message;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
-import com.xxkun.relayserver.dao.Message;
-import com.xxkun.relayserver.dao.Request;
+import com.xxkun.relayserver.dao.request.Message;
+import com.xxkun.relayserver.dao.request.Request;
 import com.xxkun.relayserver.dto.MessageType;
 
 import java.net.InetSocketAddress;
