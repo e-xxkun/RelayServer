@@ -5,6 +5,8 @@ import com.xxkun.relayserver.dao.request.Message;
 import com.xxkun.relayserver.dao.request.Request;
 import com.xxkun.relayserver.dto.MessageType;
 
+import java.nio.BufferUnderflowException;
+
 public class HeartbeatMessage extends Message {
 
     private String token;
@@ -28,11 +30,14 @@ public class HeartbeatMessage extends Message {
     }
 
     @Override
-    protected void decode(Request udpField) {
-        Request.BodyBuffer buffer = udpField.getByteBuffer();
-
-        // skip the message type byte
-        buffer.skip(Integer.BYTES);
-        token = buffer.getString(MESSAGE_TOKEN_LEN);
+    protected void decode(Request udpField) throws MessageResolutionException {
+        Request.BodyBuffer buffer = udpField.getBodyBuffer();
+        try {
+            // skip the message type byte
+            buffer.skip(Integer.BYTES);
+            token = buffer.getString(MESSAGE_TOKEN_LEN);
+        } catch (BufferUnderflowException | IllegalArgumentException e) {
+            throw new MessageResolutionException();
+        }
     }
 }

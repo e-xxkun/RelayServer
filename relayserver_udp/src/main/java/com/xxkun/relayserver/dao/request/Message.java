@@ -25,7 +25,7 @@ public abstract class Message {
     protected abstract void decode(Request request) throws MessageResolutionException;
 
     public static Message decodeFromRequest(@NonNull Request request) {
-        Request.BodyBuffer buffer = request.getByteBuffer();
+        Request.BodyBuffer buffer = request.getBodyBuffer();
         int type = buffer.getInt();
         IMessageType messageType = IMessageType.fromTypeCode(type);
         if (messageType == null)

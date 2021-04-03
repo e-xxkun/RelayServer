@@ -25,11 +25,15 @@ public abstract class Response implements Delayed {
 
     private ResponseType type;
 
-    protected final BodyBuffer bodyBuffer;
+    private final BodyBuffer bodyBuffer;
 
     private String id;
 
     private int resendTime = 0;
+
+    public Response() {
+        bodyBuffer = null;
+    }
 
     public Response(InetSocketAddress socketAddress) {
         bodyBuffer = new BodyBuffer();
@@ -100,6 +104,8 @@ public abstract class Response implements Delayed {
 
     public abstract ResponseType getType();
 
+    protected abstract void overwriteToByteArray(BodyBuffer bodyBuffer);
+
     @Override
     public long getDelay(TimeUnit unit) {
         return getSendDate();
@@ -136,6 +142,9 @@ public abstract class Response implements Delayed {
         }
 
         public void writeInt(int value) {
+            if (position() < 0) {
+                position(0);
+            }
             byteBuffer.putInt(value);
         }
 

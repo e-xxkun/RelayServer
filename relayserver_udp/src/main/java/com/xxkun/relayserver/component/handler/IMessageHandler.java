@@ -4,5 +4,5 @@ import com.xxkun.relayserver.dao.request.Message;
 
 public interface IMessageHandler {
 
-    void consume(Message message);
+    void consume(Message message );
 }

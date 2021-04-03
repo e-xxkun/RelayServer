@@ -1,6 +1,7 @@
 package com.xxkun.relayserver.send;
 
 import com.xxkun.relayserver.component.BaseThread;
+import com.xxkun.relayserver.dao.response.AckResponse;
 import com.xxkun.relayserver.dao.response.Response;
 import com.xxkun.relayserver.dao.UserClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,14 @@ public class ResponsePool {
 
     public void close() {
         timeoutListenThread.close();
+    }
+
+    public Response createResponse(InetSocketAddress socketAddress, long sequence) {
+        return new AckResponse(socketAddress, sequence);
+    }
+
+    public AckResponse createAckResponse(InetSocketAddress socketAddress, long sequence) {
+        return new AckResponse(socketAddress, sequence);
     }
 
     public class ResponseTimeoutListenThread extends BaseThread {

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 
 import java.net.InetSocketAddress;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
@@ -19,7 +20,7 @@ public final class Request {
 
     private static final int HEAD_LEN = 4 * Integer.BYTES + Long.BYTES;
 
-    private Long sequence;
+    private long sequence;
 
     private Date receiveDate;
 
@@ -47,16 +48,16 @@ public final class Request {
         this.receiveDate = receiveDate;
     }
 
+    public long getSequence() {
+        return sequence;
+    }
+
     public RequestType getType() {
         return type;
     }
 
     public Integer getClientVersion() {
         return clientVersion;
-    }
-
-    public void setSequence(Long sequence) {
-        this.sequence = sequence;
     }
 
     public InetSocketAddress getSocketAddress() {
@@ -69,7 +70,6 @@ public final class Request {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
 
         // HEAD|sequence|clientVersion|cmdId|bodyLength  ->  int|long|int|int|int
-
         if (buffer.getInt() != HEAD)
             throw new RequestResolutionException();
         long seq = buffer.getLong();
@@ -85,7 +85,7 @@ public final class Request {
         return new Request(buffer, seq, clientVersion, cmdId, bodyLength, socketAddress);
     }
 
-    public BodyBuffer getByteBuffer() {
+    public BodyBuffer getBodyBuffer() {
         return bodyBuffer;
     }
 
@@ -102,30 +102,45 @@ public final class Request {
 
         public int getInt() {
             if (Integer.BYTES > remainLength()) {
-                return -1;
+                throw new BufferUnderflowException();
             }
-            return bodyBuffer.getInt();
+            return byteBuffer.getInt();
         }
 
-        public boolean skip(int length) {
+        public long getLong() {
+            if (Long.BYTES > remainLength()) {
+                throw new BufferUnderflowException();
+            }
+            return byteBuffer.getLong();
+        }
+
+        public void skip(int length) {
             if (length > remainLength()) {
-                return false;
+                throw new IllegalArgumentException();
             }
             byteBuffer.position(byteBuffer.position() + length);
-            return true;
         }
 
-        public int remainLength() {
+        public void position(int index) {
+            index = Math.max(index, 0);
+            byteBuffer.position(HEAD_LEN + index);
+        }
+
+        public int position() {
+            return byteBuffer.position() - HEAD_LEN;
+        }
+
+        private int remainLength() {
             return HEAD_LEN + bodyLength - byteBuffer.position();
         }
 
-        public void reset() {
-            byteBuffer.position(HEAD_LEN);
+        public int getBodyLength() {
+            return bodyLength;
         }
 
         public String getString(int length) {
             if (Character.BYTES * length > remainLength()) {
-                return null;
+                throw new BufferUnderflowException();
             }
             StringBuilder builder = new StringBuilder();
             for (int i = 0;i < length;i ++) {

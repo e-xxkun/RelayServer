@@ -1,6 +1,6 @@
 package com.xxkun.relayserver.receive;
 
-import com.xxkun.relayserver.send.ACKHandler;
+import com.xxkun.relayserver.send.AckHandler;
 import com.xxkun.relayserver.component.queue.IMessageQueue;
 import com.xxkun.relayserver.dao.request.Message;
 import com.xxkun.relayserver.dao.request.Request;
@@ -23,9 +23,7 @@ public class RequestHandler implements RequestListener.OnRequest {
     @Autowired
     private IMessageQueue getMsgQueueSender;
     @Autowired
-    private RequestHandler requestHandler;
-    @Autowired
-    private ACKHandler ackHandler;
+    private AckHandler ackHandler;
 
     @Override
     public void onRequest(SocketAddress from, Request request) {
@@ -36,10 +34,12 @@ public class RequestHandler implements RequestListener.OnRequest {
 
         Message message = Message.decodeFromRequest(request);
         if (message == null) {
+            ackHandler.replyUnknown(request);
             return;
         }
         UserSession userSession = userInfoManageService.getUserSessionFromToken(message.getToken());
         if (userSession == null) {
+            ackHandler.replyLoginExpire(request);
             return;
         }
         if (request.getType().isGET()) {
@@ -47,5 +47,6 @@ public class RequestHandler implements RequestListener.OnRequest {
         } else if (request.getType().isPUT()){
             putMsgQueueSender.sendMessage(message);
         }
+        ackHandler.replySuccess(request);
     }
 }
