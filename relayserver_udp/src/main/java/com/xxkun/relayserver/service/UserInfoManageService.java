@@ -8,7 +8,7 @@ public interface UserInfoManageService {
 
     public UserSession getUserSessionFromToken(String token);
 
-    public String getUserInfoFromUserId(String userId);
+    public UserInfo getUserInfoFromUserId(long userId);
 
     public UserInfo getUserInfoFromUserSession(UserInfo userInfo);
 

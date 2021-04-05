@@ -1,5 +1,6 @@
 package com.xxkun.relayserver.send;
 
+import com.xxkun.relayserver.component.exception.ResponseConvertException;
 import com.xxkun.relayserver.dao.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,8 @@ public class ResponseSender implements ResponsePool.OnResponseTimeout {
             DatagramPacket packet = new DatagramPacket(response.convertToByteArray(), response.getBodyLength(), response.getSocketAddress());
             sender.send(packet);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ResponseConvertException e) {
             e.printStackTrace();
         }
     }

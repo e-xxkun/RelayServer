@@ -20,7 +20,7 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
     }
 
     @Override
-    public String getUserInfoFromUserId(String userId) {
+    public UserInfo getUserInfoFromUserId(long userId) {
         return null;
     }
 

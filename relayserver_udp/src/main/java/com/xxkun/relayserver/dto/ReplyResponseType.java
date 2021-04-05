@@ -1,13 +1,16 @@
 package com.xxkun.relayserver.dto;
 
-public enum  AckResponseType {
-    SUCCESS(0),
-    LOGIN_EXPIRE(1),
-    UNKNOWN(2);
+public enum ReplyResponseType {
+    UNKNOWN(0),
+    SUCCESS(1),
+    LOGIN_EXPIRE(2),
+
+    USER_NOT_EXIST(3),
+    USER_OFFLINE(4);
 
     final int code;
 
-    AckResponseType(int code) {
+    ReplyResponseType(int code) {
         this.code = code;
     }
 

@@ -1,5 +1,7 @@
 package com.xxkun.relayserver.dao.response;
 
+import com.xxkun.relayserver.component.exception.ResponseConvertException;
+
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Date;
@@ -82,13 +84,14 @@ public abstract class Response implements Delayed {
         return resendTime >= MAX_RESEND_TIME;
     }
 
-    public byte[] convertToByteArray() {
+    public byte[] convertToByteArray() throws ResponseConvertException {
         int curIndex = bodyBuffer.position();
         bodyBuffer.byteBuffer.position(Integer.BYTES);
         bodyBuffer.byteBuffer.putLong(sequence);
         bodyBuffer.byteBuffer.putInt(getType().getCmdId());
         bodyBuffer.byteBuffer.putInt(getBodyLength());
         bodyBuffer.position(curIndex);
+        overwriteToByteArray(bodyBuffer);
         return bodyBuffer.byteBuffer.array();
     }
 
@@ -104,7 +107,7 @@ public abstract class Response implements Delayed {
 
     public abstract ResponseType getType();
 
-    protected abstract void overwriteToByteArray(BodyBuffer bodyBuffer);
+    protected abstract void overwriteToByteArray(BodyBuffer bodyBuffer) throws ResponseConvertException;
 
     @Override
     public long getDelay(TimeUnit unit) {
@@ -165,6 +168,13 @@ public abstract class Response implements Delayed {
 
         public int limit() {
             return UDP_MSG_MAX_LEN - HEAD_LEN;
+        }
+
+        public void writeLong(long value) {
+            if (position() < 0) {
+                position(0);
+            }
+            byteBuffer.putLong(value);
         }
     }
 

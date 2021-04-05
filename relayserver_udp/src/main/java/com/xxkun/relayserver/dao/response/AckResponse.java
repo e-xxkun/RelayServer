@@ -1,19 +1,19 @@
 package com.xxkun.relayserver.dao.response;
 
-import com.xxkun.relayserver.dto.AckResponseType;
+import com.xxkun.relayserver.dto.ReplyResponseType;
 
 import java.net.InetSocketAddress;
 
 public class AckResponse extends Response{
 
-    private AckResponseType type = AckResponseType.UNKNOWN;
+    private ReplyResponseType type = ReplyResponseType.SUCCESS;
 
     public AckResponse(InetSocketAddress socketAddress, long sequence) {
         super(socketAddress);
         setSequence(sequence);
     }
 
-    public void setType(AckResponseType type) {
+    public void setType(ReplyResponseType type) {
         this.type = type;
     }
 
