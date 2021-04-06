@@ -6,15 +6,18 @@ import com.xxkun.relayserver.dao.UserInfo;
 
 public interface UserInfoManageService {
 
-    public UserSession getUserSessionFromToken(String token);
+    UserSession getUserSessionFromToken(String token);
 
-    public UserInfo getUserInfoFromUserId(long userId);
+    UserInfo getUserInfoFromUserId(long userId);
 
-    public UserInfo getUserInfoFromUserSession(UserInfo userInfo);
+    UserInfo getUserInfoFromUserSession(UserSession userSession);
 
-    public void updateUserSession(UserSession userSession);
+    UserIdentifier updateUserInfo(UserSession userInfo);
 
-    public UserIdentifier updateUserInfo(UserSession userInfo);
+    void setUserSession(UserSession userSession);
 
-    public void setUserSession(UserSession userSession);
+    UserInfo refreshUserSession(UserSession userSession);
+
+    boolean isUserSessionExpire();
+
 }

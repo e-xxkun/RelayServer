@@ -12,9 +12,8 @@ public class UserExceptionResponse extends Response{
 
     private List<UserInfo> userInfos;
 
-    public UserExceptionResponse(InetSocketAddress socketAddress, List<UserInfo> userInfos) {
+    public UserExceptionResponse(InetSocketAddress socketAddress) {
         super(socketAddress);
-        setUserInfos(userInfos);
     }
 
     public void setType(ReplyResponseType type) {

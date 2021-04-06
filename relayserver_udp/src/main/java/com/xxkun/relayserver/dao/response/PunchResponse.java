@@ -14,9 +14,8 @@ public class PunchResponse extends Response {
 
     private int bodyLength;
 
-    public PunchResponse(InetSocketAddress socketAddress, List<UserInfo> userInfos) {
+    public PunchResponse(InetSocketAddress socketAddress) {
         super(socketAddress);
-        setUserInfos(userInfos);
     }
 
     public List<UserInfo> getUserInfos() {
@@ -37,7 +36,8 @@ public class PunchResponse extends Response {
         if (!hashNext()) {
             return null;
         }
-        PunchResponse response = new PunchResponse(getSocketAddress(), userInfos);
+        PunchResponse response = new PunchResponse(getSocketAddress());
+        response.userInfos = userInfos;
         response.index = index;
         return super.next();
     }
@@ -61,7 +61,7 @@ public class PunchResponse extends Response {
             UserInfo info = userInfos.get(i);
             bodyBuffer.writeLong(info.getUserId());
             bodyBuffer.writeString(info.getNameUrl());
-            bodyLength += info.getBytesLength();
+            bodyLength += info.bytesLength();
         }
         bodyBuffer.position(0);
         bodyBuffer.writeInt(i - index);

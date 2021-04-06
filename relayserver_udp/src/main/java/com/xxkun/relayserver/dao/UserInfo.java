@@ -1,10 +1,54 @@
 package com.xxkun.relayserver.dao;
 
+import com.xxkun.relayserver.dto.NatType;
+import com.xxkun.relayserver.dto.UserStatus;
+
 public class UserInfo {
-    private long userId;
+
+    private final long userId;
+
+    private String name;
+
+    private UserStatus status;
+
+    private NatType natType;
+
+    private UserSession session;
 
     public UserInfo(long userId) {
         this.userId = userId;
+    }
+
+    public NatType getNatType() {
+        return natType;
+    }
+
+    public void setNatType(NatType natType) {
+        this.natType = natType;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public UserSession getSession() {
+        return session;
+    }
+
+    public void setSession(UserSession session) {
+        this.session = session;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public boolean isOffload() {
@@ -19,7 +63,7 @@ public class UserInfo {
         return null;
     }
 
-    public int getBytesLength() {
+    public int bytesLength() {
         return 0;
     }
 }

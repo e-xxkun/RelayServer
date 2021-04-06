@@ -42,6 +42,7 @@ public class RequestHandler implements RequestListener.OnRequest {
             replyHandler.replyLoginExpire(request);
             return;
         }
+        message.setUserSession(userSession);
         if (request.getType().isGET()) {
             getMsgQueueSender.sendMessage(message);
         } else if (request.getType().isPUT()){

@@ -3,11 +3,8 @@ package com.xxkun.relayserver.send;
 import com.xxkun.relayserver.component.BaseThread;
 import com.xxkun.relayserver.dao.UserInfo;
 import com.xxkun.relayserver.dao.request.Request;
-import com.xxkun.relayserver.dao.response.AckResponse;
-import com.xxkun.relayserver.dao.response.PunchResponse;
-import com.xxkun.relayserver.dao.response.Response;
+import com.xxkun.relayserver.dao.response.*;
 import com.xxkun.relayserver.dao.UserClient;
-import com.xxkun.relayserver.dao.response.UserExceptionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -78,12 +75,16 @@ public class ResponsePool {
         return new AckResponse(socketAddress, sequence);
     }
 
-    public UserExceptionResponse createUserExceptionResponse(InetSocketAddress socketAddress, List<UserInfo> notExistUsers) {
-        return new UserExceptionResponse(socketAddress, notExistUsers);
+    public UserExceptionResponse createUserExceptionResponse(InetSocketAddress socketAddress) {
+        return new UserExceptionResponse(socketAddress);
     }
 
-    public PunchResponse createPunchResponse(InetSocketAddress socketAddress, List<UserInfo> punchUsers) {
-        return new PunchResponse(socketAddress, punchUsers);
+    public PunchResponse createPunchResponse(InetSocketAddress socketAddress) {
+        return new PunchResponse(socketAddress);
+    }
+
+    public HeartbeatResponse createHeartbeatResponse(InetSocketAddress socketAddress) {
+        return new HeartbeatResponse(socketAddress);
     }
 
     public class ResponseTimeoutListenThread extends BaseThread {

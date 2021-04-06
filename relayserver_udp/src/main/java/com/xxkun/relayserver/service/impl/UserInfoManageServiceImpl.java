@@ -25,13 +25,8 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
     }
 
     @Override
-    public UserInfo getUserInfoFromUserSession(UserInfo userInfo) {
+    public UserInfo getUserInfoFromUserSession(UserSession userSession) {
         return null;
-    }
-
-    @Override
-    public void updateUserSession(UserSession userSession) {
-
     }
 
     @Override
@@ -43,5 +38,15 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
     @Override
     public void setUserSession(UserSession userSession) {
 
+    }
+
+    @Override
+    public UserInfo refreshUserSession(UserSession userSession) {
+        return null;
+    }
+
+    @Override
+    public boolean isUserSessionExpire() {
+        return false;
     }
 }

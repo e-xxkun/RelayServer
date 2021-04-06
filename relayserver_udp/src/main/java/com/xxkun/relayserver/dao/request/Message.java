@@ -1,6 +1,7 @@
 package com.xxkun.relayserver.dao.request;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
+import com.xxkun.relayserver.dao.UserSession;
 import com.xxkun.relayserver.dto.IMessageType;
 import com.xxkun.relayserver.dto.MessageType;
 import org.springframework.lang.NonNull;
@@ -11,6 +12,8 @@ public abstract class Message {
 
     private final Request request;
 
+    private UserSession userSession;
+
     public Message(@NonNull Request request) throws MessageResolutionException {
         this.request = request;
         decode(request);
@@ -18,6 +21,14 @@ public abstract class Message {
 
     public String getToken() {
         return null;
+    }
+
+    public UserSession getUserSession() {
+        return userSession;
+    }
+
+    public void setUserSession(UserSession userSession) {
+        this.userSession = userSession;
     }
 
     public abstract MessageType getType();

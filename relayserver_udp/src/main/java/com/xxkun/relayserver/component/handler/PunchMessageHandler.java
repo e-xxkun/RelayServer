@@ -26,6 +26,10 @@ public class PunchMessageHandler implements IMessageHandler{
     @Override
     public void consume(Message message) {
         PunchMessage punchMessage = (PunchMessage) message;
+
+//        TODO Judge user status
+        UserInfo user = userInfoManageService.getUserInfoFromUserSession(message.getUserSession());
+
         UserInfo[] userInfos = punchMessage.getUserInfos();
         List<UserInfo> notExistUsers = new ArrayList<>();
         List<UserInfo> offloadUsers = new ArrayList<>();
@@ -34,25 +38,36 @@ public class PunchMessageHandler implements IMessageHandler{
             UserInfo userInfo = userInfoManageService.getUserInfoFromUserId(info.getUserId());
             if (userInfo == null) {
                 notExistUsers.add(info);
-            } else if (userInfo.isOffload()) {
+            } else if (!userInfo.getStatus().isOnline()) {
                 offloadUsers.add(info);
             } else {
                 punchUsers.add(userInfo);
             }
         }
         if (notExistUsers.size() > 0) {
-            UserExceptionResponse response = responsePool.createUserExceptionResponse(punchMessage.getRequest().getSocketAddress(), notExistUsers);
+            UserExceptionResponse response = responsePool.createUserExceptionResponse(punchMessage.getRequest().getSocketAddress());
+            response.setUserInfos(notExistUsers);
             response.setType(ReplyResponseType.USER_NOT_EXIST);
             responseSender.send(response);
         }
         if (offloadUsers.size() > 0) {
-            UserExceptionResponse response = responsePool.createUserExceptionResponse(punchMessage.getRequest().getSocketAddress(), offloadUsers);
+            UserExceptionResponse response = responsePool.createUserExceptionResponse(punchMessage.getRequest().getSocketAddress());
+            response.setUserInfos(offloadUsers);
             response.setType(ReplyResponseType.USER_OFFLINE);
             responseSender.send(response);
         }
         if (punchUsers.size() > 0) {
-            PunchResponse response = responsePool.createPunchResponse(punchMessage.getRequest().getSocketAddress(), punchUsers);
+            PunchResponse response = responsePool.createPunchResponse(punchMessage.getRequest().getSocketAddress());
+            response.setUserInfos(punchUsers);
             responseSender.send(response);
+
+            List<UserInfo> userInfo = new ArrayList<>(1);
+            userInfo.add(user);
+            for (UserInfo info : punchUsers) {
+                PunchResponse punchResponse = responsePool.createPunchResponse(punchMessage.getRequest().getSocketAddress());
+                punchResponse.setUserInfos(userInfo);
+                responseSender.send(punchResponse);
+            }
         }
     }
 }

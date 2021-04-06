@@ -6,7 +6,9 @@ public enum ReplyResponseType {
     LOGIN_EXPIRE(2),
 
     USER_NOT_EXIST(3),
-    USER_OFFLINE(4);
+    USER_OFFLINE(4),
+
+    UPDATE_TOKEN(5);
 
     final int code;
 
