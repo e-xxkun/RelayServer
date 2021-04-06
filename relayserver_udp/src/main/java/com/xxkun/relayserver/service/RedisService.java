@@ -1,5 +1,7 @@
 package com.xxkun.relayserver.service;
 
+import java.util.Map;
+
 public interface RedisService {
 
     void set(String key, String value);
@@ -14,6 +16,10 @@ public interface RedisService {
 
     String get(String key);
 
+    String getValueFromMap(String field, String key);
+
+    Map<Object, Object> getMap(String key);
+
     /**
      * @describe: 设置超时时间
      * @param key
@@ -25,4 +31,8 @@ public interface RedisService {
     void remove(String key);
 
     Long increment(String key, long delta);
+
+    long stringToLong(String str);
+
+    String longToString(long value);
 }

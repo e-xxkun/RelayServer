@@ -15,6 +15,8 @@ public class UserInfo {
 
     private UserSession session;
 
+    private String url;
+
     public UserInfo(long userId) {
         this.userId = userId;
     }
@@ -57,6 +59,14 @@ public class UserInfo {
 
     public long getUserId() {
         return userId;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getNameUrl() {
