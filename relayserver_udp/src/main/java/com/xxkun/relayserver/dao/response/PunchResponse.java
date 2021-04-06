@@ -1,30 +1,50 @@
 package com.xxkun.relayserver.dao.response;
 
 import com.xxkun.relayserver.component.exception.ResponseConvertException;
-import com.xxkun.relayserver.dao.FriendInfo;
+import com.xxkun.relayserver.dao.UserInfo;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 public class PunchResponse extends Response {
 
-    private FriendInfo friendInfo;
+    private List<UserInfo> userInfos;
 
-    public PunchResponse(InetSocketAddress socketAddress, FriendInfo friendInfo) {
+    private int index = 0;
+
+    private int bodyLength;
+
+    public PunchResponse(InetSocketAddress socketAddress, List<UserInfo> userInfos) {
         super(socketAddress);
-        setFriendInfo(friendInfo);
+        setUserInfos(userInfos);
     }
 
-    public FriendInfo getFriendInfo() {
-        return friendInfo;
+    public List<UserInfo> getUserInfos() {
+        return userInfos;
     }
 
-    public void setFriendInfo(FriendInfo friendInfo) {
-        this.friendInfo = friendInfo;
+    public void setUserInfos(List<UserInfo> userInfos) {
+        this.userInfos = userInfos;
+    }
+
+    @Override
+    public boolean hashNext() {
+        return index < userInfos.size();
+    }
+
+    @Override
+    public Response next() {
+        if (!hashNext()) {
+            return null;
+        }
+        PunchResponse response = new PunchResponse(getSocketAddress(), userInfos);
+        response.index = index;
+        return super.next();
     }
 
     @Override
     public int getBodyLength() {
-        return friendInfo.getBytesLength();
+        return bodyLength;
     }
 
     @Override
@@ -34,10 +54,17 @@ public class PunchResponse extends Response {
 
     @Override
     protected void overwriteToByteArray(BodyBuffer bodyBuffer) throws ResponseConvertException {
-        if (friendInfo == null || friendInfo.getBytesLength() > bodyBuffer.limit()) {
-            throw new ResponseConvertException();
+        bodyLength = 0;
+        bodyBuffer.skip(Integer.BYTES);
+        int i = index;
+        for (;i < userInfos.size() && bodyLength < bodyBuffer.limit();i ++) {
+            UserInfo info = userInfos.get(i);
+            bodyBuffer.writeLong(info.getUserId());
+            bodyBuffer.writeString(info.getNameUrl());
+            bodyLength += info.getBytesLength();
         }
-        bodyBuffer.writeLong(friendInfo.getUserId());
-        bodyBuffer.writeString(friendInfo.getNameUrl());
+        bodyBuffer.position(0);
+        bodyBuffer.writeInt(i - index);
+        index = i;
     }
 }

@@ -1,33 +1,32 @@
 package com.xxkun.relayserver.dao.response;
 
-import com.xxkun.relayserver.dao.FriendInfo;
 import com.xxkun.relayserver.dao.UserInfo;
 import com.xxkun.relayserver.dto.ReplyResponseType;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 
-public class FriendExceptionResponse extends Response{
+public class UserExceptionResponse extends Response{
 
     private ReplyResponseType type = ReplyResponseType.UNKNOWN;
 
-    private List<FriendInfo> friendInfos;
+    private List<UserInfo> userInfos;
 
-    public FriendExceptionResponse(InetSocketAddress socketAddress, long sequence) {
+    public UserExceptionResponse(InetSocketAddress socketAddress, List<UserInfo> userInfos) {
         super(socketAddress);
-        setSequence(sequence);
+        setUserInfos(userInfos);
     }
 
     public void setType(ReplyResponseType type) {
         this.type = type;
     }
 
-    public List<FriendInfo> getFriendInfos() {
-        return friendInfos;
+    public List<UserInfo> getUserInfos() {
+        return userInfos;
     }
 
-    public void setFriendInfos(List<FriendInfo> friendInfos) {
-        this.friendInfos = friendInfos;
+    public void setUserInfos(List<UserInfo> userInfos) {
+        this.userInfos = userInfos;
     }
 
     @Override
@@ -44,8 +43,8 @@ public class FriendExceptionResponse extends Response{
     protected void overwriteToByteArray(BodyBuffer bodyBuffer) {
         bodyBuffer.position(0);
         bodyBuffer.writeInt(type.getCode());
-        bodyBuffer.writeInt(friendInfos.size());
-        for (FriendInfo info : friendInfos) {
+        bodyBuffer.writeInt(userInfos.size());
+        for (UserInfo info : userInfos) {
             bodyBuffer.writeLong(info.getUserId());
         }
     }

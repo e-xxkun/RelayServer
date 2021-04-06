@@ -39,6 +39,10 @@ public abstract class Message {
         return message;
     }
 
+    public Request getRequest() {
+        return request;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -85,13 +85,13 @@ public abstract class Response implements Delayed {
     }
 
     public byte[] convertToByteArray() throws ResponseConvertException {
+        overwriteToByteArray(bodyBuffer);
         int curIndex = bodyBuffer.position();
         bodyBuffer.byteBuffer.position(Integer.BYTES);
         bodyBuffer.byteBuffer.putLong(sequence);
         bodyBuffer.byteBuffer.putInt(getType().getCmdId());
         bodyBuffer.byteBuffer.putInt(getBodyLength());
         bodyBuffer.position(curIndex);
-        overwriteToByteArray(bodyBuffer);
         return bodyBuffer.byteBuffer.array();
     }
 
@@ -101,6 +101,14 @@ public abstract class Response implements Delayed {
             id += socketAddress.toString();
         }
         id += sequence;
+    }
+
+    public boolean hashNext() {
+        return false;
+    }
+
+    public Response next() {
+        return null;
     }
 
     public abstract int getBodyLength();

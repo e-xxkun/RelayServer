@@ -35,6 +35,10 @@ public class ResponseSender implements ResponsePool.OnResponseTimeout {
 
     public void send(Response response) {
         send(response, true);
+        if (response.hashNext()) {
+            response = response.next();
+            send(response, true);
+        }
     }
 
     @Override
