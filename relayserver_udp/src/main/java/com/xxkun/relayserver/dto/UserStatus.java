@@ -35,4 +35,11 @@ public enum UserStatus {
     public boolean isInvisible() {
         return false;
     }
+
+    public static UserStatus fromCode(int code) {
+        if (code < 0 || code >= UserStatus.values().length) {
+            return UserStatus.values()[code];
+        }
+        return OFFLINE;
+    }
 }

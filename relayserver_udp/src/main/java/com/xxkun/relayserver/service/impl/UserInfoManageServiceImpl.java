@@ -3,10 +3,12 @@ package com.xxkun.relayserver.service.impl;
 import com.xxkun.relayserver.dao.UserIdentifier;
 import com.xxkun.relayserver.dao.UserInfo;
 import com.xxkun.relayserver.dao.UserSession;
+import com.xxkun.relayserver.dto.NatType;
+import com.xxkun.relayserver.dto.UserStatus;
 import com.xxkun.relayserver.service.RedisService;
 import com.xxkun.relayserver.service.UserInfoManageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -16,6 +18,10 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
 
     @Autowired
     private RedisService redisService;
+    @Value("redis.key.expire.EXPIRE_TIME")
+    private long EXPIRE_TIME;
+    @Value("redis.key.expire.EXPIRE_TIME_RATIO")
+    private float EXPIRE_TIME_RATIO;
 
     @Override
     public UserSession getUserSessionFromToken(String token) {
@@ -39,31 +45,29 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
         UserInfo userInfo = new UserInfo(userId);
         userInfo.setName((String) userMap.get("NAME"));
         userInfo.setUrl((String) userMap.get("URL"));
+        userInfo.setStatus(UserStatus.fromCode((Integer) userMap.get("STATE")));
+        userInfo.setNatType(NatType.fromCode((Integer) userMap.get("TYPE")));
+        userInfo.setIdentifier(new UserIdentifier((String) userMap.get("IDENTIFIER")));
         return userInfo;
     }
 
     @Override
     public UserInfo getUserInfoFromUserSession(UserSession userSession) {
-        return null;
-    }
-
-    @Override
-    public UserIdentifier updateUserInfo(UserSession userInfo) {
-        return null;
-    }
-
-    @Override
-    public void setUserSession(UserSession userSession) {
-
+        UserInfo info = getUserInfoFromUserId(userSession.getUserId());
+        info.setSession(userSession);
+        return info;
     }
 
     @Override
     public UserInfo refreshUserSession(UserSession userSession) {
-        return null;
+        UserInfo info = new UserInfo(userSession.getUserId());
+
+        return  info;
     }
 
     @Override
-    public boolean isUserSessionExpire() {
-        return false;
+    public boolean isUserSessionExpire(UserSession userSession) {
+        long expireTime = redisService.getExpireTime(userSession.getToken());
+        return expireTime < EXPIRE_TIME * EXPIRE_TIME_RATIO;
     }
 }

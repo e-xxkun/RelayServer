@@ -37,7 +37,8 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public boolean hasKey(String key) {
-        return stringRedisTemplate.hasKey(key);
+        Boolean k = stringRedisTemplate.hasKey(key);
+        return k != null && k;
     }
 
     @Override
@@ -58,6 +59,12 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void expire(String key, long auth_code_expire_seconds) {
         stringRedisTemplate.expire(key, auth_code_expire_seconds, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public long getExpireTime(String key) {
+        Long time = stringRedisTemplate.getExpire(key);
+        return time == null ? -1L : time;
     }
 
     @Override
