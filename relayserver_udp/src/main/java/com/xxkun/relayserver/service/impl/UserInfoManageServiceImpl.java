@@ -60,8 +60,8 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
 
     @Override
     public UserInfo refreshUserSession(UserSession userSession) {
-        UserInfo info = new UserInfo(userSession.getUserId());
-
+        UserInfo info = getUserInfoFromUserSession(userSession);
+        String identifier = info.getIdentifier().update();
         return  info;
     }
 

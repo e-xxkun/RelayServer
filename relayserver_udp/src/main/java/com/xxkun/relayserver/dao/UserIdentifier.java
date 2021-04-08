@@ -17,9 +17,10 @@ public class UserIdentifier {
                 || this.identifier.regionMatches(IDENTIFIER_LEN, identifier, 0, IDENTIFIER_LEN);
     }
 
-    public void update() {
+    public String update() {
         String token = UUID.randomUUID().toString();
         identifier = token.substring(0, IDENTIFIER_LEN) + identifier.substring(0, IDENTIFIER_LEN);
+        return identifier;
     }
 
     @Override
