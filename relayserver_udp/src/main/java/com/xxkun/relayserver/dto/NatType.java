@@ -15,4 +15,11 @@ public enum NatType {
     public int getCode() {
         return code;
     }
+
+    public static NatType fromCode(int code) {
+        if (code < 0 || code >= UserStatus.values().length) {
+            return NatType.values()[code];
+        }
+        return SYMMETRIC;
+    }
 }

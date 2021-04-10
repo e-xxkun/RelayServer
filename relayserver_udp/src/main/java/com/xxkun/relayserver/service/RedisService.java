@@ -28,6 +28,8 @@ public interface RedisService {
      */
     void expire(String key, long auth_code_expire_seconds);
 
+    long getExpireTime(String key);
+
     void remove(String key);
 
     Long increment(String key, long delta);

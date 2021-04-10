@@ -19,6 +19,8 @@ public class UserInfo {
 
     private String url;
 
+    private UserIdentifier identifier;
+
     public UserInfo(long userId) {
         this.userId = userId;
     }
@@ -37,6 +39,14 @@ public class UserInfo {
 
     public UserSession getSession() {
         return session;
+    }
+
+    public UserIdentifier getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(UserIdentifier identifier) {
+        this.identifier = identifier;
     }
 
     public void setSession(UserSession session) {

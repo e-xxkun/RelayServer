@@ -21,7 +21,7 @@ public class HeartbeatMessageHandler implements IMessageHandler {
     @Override
     public void consume(Message message) {
 //        TODO
-        if (!userInfoManageService.isUserSessionExpire()) {
+        if (!userInfoManageService.isUserSessionExpire(message.getUserSession())) {
             return;
         }
         UserInfo userInfo = userInfoManageService.refreshUserSession(message.getUserSession());

@@ -12,12 +12,7 @@ public interface UserInfoManageService {
 
     UserInfo getUserInfoFromUserSession(UserSession userSession);
 
-    UserIdentifier updateUserInfo(UserSession userInfo);
-
-    void setUserSession(UserSession userSession);
-
     UserInfo refreshUserSession(UserSession userSession);
 
-    boolean isUserSessionExpire();
-
+    boolean isUserSessionExpire(UserSession userSession);
 }
