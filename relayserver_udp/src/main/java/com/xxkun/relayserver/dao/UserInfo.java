@@ -3,6 +3,8 @@ package com.xxkun.relayserver.dao;
 import com.xxkun.relayserver.dto.NatType;
 import com.xxkun.relayserver.dto.UserStatus;
 
+import java.net.InetSocketAddress;
+
 public class UserInfo {
 
     private final long userId;
@@ -70,6 +72,10 @@ public class UserInfo {
     }
 
     public String getNameUrl() {
+        return null;
+    }
+
+    public InetSocketAddress getSocketAddress() {
         return null;
     }
 

@@ -64,7 +64,7 @@ public class PunchMessageHandler implements IMessageHandler{
             List<UserInfo> userInfo = new ArrayList<>(1);
             userInfo.add(user);
             for (UserInfo info : punchUsers) {
-                PunchResponse punchResponse = responsePool.createPunchResponse(punchMessage.getRequest().getSocketAddress());
+                PunchResponse punchResponse = responsePool.createPunchResponse(info.getSocketAddress());
                 punchResponse.setUserInfos(userInfo);
                 responseSender.send(punchResponse);
             }
