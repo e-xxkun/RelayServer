@@ -20,7 +20,6 @@ public class HeartbeatMessageHandler implements IMessageHandler {
     private ResponseSender responseSender;
     @Override
     public void consume(Message message) {
-//        TODO
         if (!userInfoManageService.isUserSessionExpire(message.getUserSession())) {
             return;
         }

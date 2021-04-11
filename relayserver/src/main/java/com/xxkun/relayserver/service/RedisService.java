@@ -25,4 +25,6 @@ public interface RedisService {
     void remove(String key);
 
     Long increment(String key, long delta);
+
+    String getValueFromMap(String field, String key);
 }

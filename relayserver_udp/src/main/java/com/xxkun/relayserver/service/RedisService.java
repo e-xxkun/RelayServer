@@ -8,17 +8,16 @@ public interface RedisService {
 
     void set(String key, String value, long time);
 
-    void leftPush(String key, String value);
-
-    void trim(String key, long start, long end);
-
     boolean hasKey(String key);
 
     String get(String key);
 
-    String getValueFromMap(String field, String key);
+    void setValueToMap(String field, String key, Object value);
 
     Map<Object, Object> getMap(String key);
+
+    String getValueFromMap(String field, String key);
+
 
     /**
      * @describe: 设置超时时间

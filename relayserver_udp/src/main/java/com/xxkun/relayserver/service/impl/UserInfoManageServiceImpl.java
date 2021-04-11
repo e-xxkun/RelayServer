@@ -9,9 +9,11 @@ import com.xxkun.relayserver.service.RedisService;
 import com.xxkun.relayserver.service.UserInfoManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class UserInfoManageServiceImpl implements UserInfoManageService {
@@ -52,21 +54,31 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
     }
 
     @Override
-    public UserInfo getUserInfoFromUserSession(UserSession userSession) {
+    public UserInfo getUserInfoFromUserSession(@NonNull UserSession userSession) {
         UserInfo info = getUserInfoFromUserId(userSession.getUserId());
         info.setSession(userSession);
         return info;
     }
 
     @Override
-    public UserInfo refreshUserSession(UserSession userSession) {
-        UserInfo info = getUserInfoFromUserSession(userSession);
-        String identifier = info.getIdentifier().update();
+    public UserInfo refreshUserSession(@NonNull UserSession userSession) {
+        String idStr = redisService.longToString(userSession.getUserId());
+        UserInfo info = new UserInfo(userSession.getUserId());
+        String identifierStr = redisService.getValueFromMap(idStr, "IDENTIFIER");
+        UserIdentifier userIdentifier = new UserIdentifier(identifierStr);
+        identifierStr = userIdentifier.update();
+        redisService.setValueToMap(idStr, "IDENTIFIER", identifierStr);
+        info.setIdentifier(userIdentifier);
+        String token = UUID.randomUUID().toString();
+        redisService.set(token, idStr, EXPIRE_TIME);
+        redisService.remove(userSession.getToken());
+        userSession.setToken(token);
+        info.setSession(userSession);
         return  info;
     }
 
     @Override
-    public boolean isUserSessionExpire(UserSession userSession) {
+    public boolean isUserSessionExpire(@NonNull UserSession userSession) {
         long expireTime = redisService.getExpireTime(userSession.getToken());
         return expireTime < EXPIRE_TIME * EXPIRE_TIME_RATIO;
     }

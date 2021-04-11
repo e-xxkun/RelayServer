@@ -26,16 +26,6 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public void leftPush(String key, String value) {
-        stringRedisTemplate.opsForList().leftPush(key, value);
-    }
-
-    @Override
-    public void trim(String key, long start, long end) {
-        stringRedisTemplate.opsForList().trim(key, start, end);
-    }
-
-    @Override
     public boolean hasKey(String key) {
         Boolean k = stringRedisTemplate.hasKey(key);
         return k != null && k;
@@ -49,6 +39,11 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public String getValueFromMap(String field, String key) {
         return (String) stringRedisTemplate.opsForHash().get(field, key);
+    }
+
+    @Override
+    public void setValueToMap(String field, String key, Object value) {
+        stringRedisTemplate.opsForHash().put(field, key, value);
     }
 
     @Override
