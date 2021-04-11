@@ -8,6 +8,11 @@ public class UserIdentifier {
 
     private String identifier;
 
+    public UserIdentifier() {
+        String identifier = UUID.randomUUID().toString();
+        this.identifier = identifier.substring(0, IDENTIFIER_LEN);
+    }
+
     public UserIdentifier(String identifier) {
         this.identifier = identifier;
     }

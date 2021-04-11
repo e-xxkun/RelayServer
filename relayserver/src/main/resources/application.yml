@@ -20,14 +20,6 @@ spring:
         min-idle: 0
     timeout: 3000ms
 
-#  rabbitmq:
-#    host: localhost # rabbitmq�����ӵ�ַ
-#    port: 5672 # rabbitmq�����Ӷ˿ں�
-#    virtual-host: /mall # rabbitmq������host
-#    username: mall # rabbitmq���û���
-#    password: xkk0512 # rabbitmq������
-#    publisher-confirms: true #������첽��Ϣ��Ҫ�ص���������Ϊtrue
-
 swagger:
   basic:
     enable: false
@@ -40,8 +32,8 @@ mybatis:
 redis:
   key:
     prefix:
-      REDIS_USER_SESSION_KEY : "REDIS_USER_SESSION_KEY"
-      REDIS_USER_IDENTIFICATION_KEY : "REDIS_USER_IDENTIFICATION_KEY"
+      REDIS_SESSION_HEAD : "SESSION_HEAD"
+      REDIS_USER_HEAD : "USER_HEAD"
     expire:
       EXPIRE_TIME: 120
 

@@ -1,28 +1,20 @@
 package com.xxkun.relayserver.dao.mbg.model;
 
-public class User {
-    private Integer id;
+import com.xxkun.relayserver.dto.UserStatus;
 
-    private String userid;
+public class User {
+    private Long id;
 
     private String name;
 
     private String password;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
-    }
-
-    public String getUserid() {
-        return userid;
-    }
-
-    public void setUserid(String userid) {
-        this.userid = userid;
     }
 
     public String getName() {
@@ -39,5 +31,9 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public UserStatus getState() {
+        return UserStatus.ONLINE;
     }
 }

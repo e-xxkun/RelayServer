@@ -28,12 +28,15 @@ public enum UserStatus {
     public boolean isOnline() {
         return false;
     }
-
     public boolean isOffline() {
         return false;
     }
     public boolean isInvisible() {
         return false;
+    }
+
+    public int getCode() {
+        return code;
     }
 
     public static UserStatus fromCode(int code) {

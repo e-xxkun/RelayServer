@@ -1,5 +1,6 @@
 package com.xxkun.relayserver.service.impl;
 
+import com.xxkun.relayserver.dao.UserIdentifier;
 import com.xxkun.relayserver.dao.UserInfo;
 import com.xxkun.relayserver.dao.UserSession;
 import com.xxkun.relayserver.dao.mbg.model.User;
@@ -9,41 +10,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class UserInfoManageServiceImpl implements UserInfoManageService {
     @Autowired
     private RedisService redisService;
-    @Value("${redis.key.prefix.REDIS_USER_SESSION_KEY}")
-    private String REDIS_USER_SESSION_KEY;
-    @Value("${redis.key.prefix.REDIS_USER_IDENTIFICATION_KEY}")
-    private String REDIS_USER_IDENTIFICATION_KEY;
     @Value("${redis.key.expire.EXPIRE_TIME}")
     private Long EXPIRE_TIME;
 
     @Override
-    public boolean isUserLogin(Integer id) {
-        return false;
+    public boolean isUserLogin(long id) {
+        return redisService.hasKey(redisService.longToString(id));
     }
 
     @Override
     public boolean isExistUserToken(String token) {
-        return false;
+        return redisService.hasKey(token);
     }
 
     @Override
     public UserInfo setUser(User user) {
         String token = UUID.randomUUID().toString();
-        redisService.set(token, user.getUserid(), EXPIRE_TIME);
-        String identification = UUID.randomUUID().toString();
-        redisService.leftPush(REDIS_USER_IDENTIFICATION_KEY + ":" + user.getUserid(), identification);
-        return null;
+        String userIdStr = redisService.longToString(user.getId());
+        redisService.set(token, userIdStr, EXPIRE_TIME);
+        UserInfo userInfo = new UserInfo(user.getId());
+        UserSession userSession = new UserSession(user.getId());
+        userSession.setToken(token);
+        UserIdentifier userIdentifier = new UserIdentifier();
+        userInfo.setIdentifier(userIdentifier);
+        userInfo.setSession(userSession);
+        redisService.setHashValue(userIdStr, "IDENTIFIER", userIdentifier.toString());
+        redisService.setHashValue(userIdStr, "STATE", user.getState().getCode());
+        return userInfo;
     }
 
     @Override
     public UserSession getUserSessionFromToken(String token) {
-        String idStr = redisService.getValueFromMap("SESSION", token);
+        String idStr = redisService.get(token);
         if (idStr == null) {
             return null;
         }
@@ -54,5 +60,11 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
         UserSession session = new UserSession(userId);
         session.setToken(token);
         return session;
+    }
+
+    @Override
+    public void removeUserFromSession(UserSession userSession) {
+        redisService.remove(userSession.getToken());
+        redisService.remove(redisService.longToString(userSession.getUserId()));
     }
 }

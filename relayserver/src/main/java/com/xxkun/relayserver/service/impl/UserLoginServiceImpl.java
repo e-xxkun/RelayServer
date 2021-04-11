@@ -2,6 +2,7 @@ package com.xxkun.relayserver.service.impl;
 
 import cn.hutool.json.JSONObject;
 import com.xxkun.relayserver.dao.UserInfo;
+import com.xxkun.relayserver.dao.UserSession;
 import com.xxkun.relayserver.dao.mbg.mapper.UserMapper;
 import com.xxkun.relayserver.dao.mbg.model.User;
 import com.xxkun.relayserver.dao.mbg.model.UserExample;
@@ -25,13 +26,6 @@ public class UserLoginServiceImpl implements UserLoginService {
     private UserMapper userMapper;
     @Autowired
     private UserInfoManageService userInfoManageService;
-
-    @Value("${redis.key.prefix.REDIS_USER_SESSION_KEY}")
-    private String REDIS_USER_SESSION_KEY;
-    @Value("${redis.key.prefix.REDIS_USER_IDENTIFICATION_KEY}")
-    private String REDIS_USER_IDENTIFICATION_KEY;
-    @Value("${redis.key.expire.EXPIRE_TIME}")
-    private Long EXPIRE_TIME;
 
     @Override
     public String login(String userId, String password) {
@@ -58,9 +52,11 @@ public class UserLoginServiceImpl implements UserLoginService {
         if (!userInfoManageService.isExistUserToken(token)) {
             return false;
         }
-
-        redisService.remove(token);
-        redisService.remove(REDIS_USER_IDENTIFICATION_KEY + ":" + userId);
+        UserSession userSession = userInfoManageService.getUserSessionFromToken(token);
+        if (userInfoManageService.isUserLogin(userSession.getUserId())) {
+            return false;
+        }
+        userInfoManageService.removeUserFromSession(userSession);
         return true;
     }
 }
