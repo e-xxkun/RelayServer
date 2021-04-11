@@ -1,6 +1,8 @@
 package com.xxkun.relayserver.service.impl;
 
 import cn.hutool.json.JSONObject;
+import com.xxkun.relayserver.component.exception.ReloginException;
+import com.xxkun.relayserver.component.exception.UserNotExistException;
 import com.xxkun.relayserver.dao.UserInfo;
 import com.xxkun.relayserver.dao.UserSession;
 import com.xxkun.relayserver.dao.mbg.mapper.UserMapper;
@@ -25,23 +27,23 @@ public class UserLoginServiceImpl implements UserLoginService {
     private UserInfoManageService userInfoManageService;
 
     @Override
-    public String login(String userId, String password) {
+    public String login(String userId, String password) throws UserNotExistException, ReloginException {
         UserExample userExample = new UserExample();
         userExample.createCriteria().andIdEqualTo(userId);
         userExample.createCriteria().andPasswordEqualTo(password);
         List<User> userList = userMapper.selectByExample(userExample);
-        if (userList != null && userList.size() > 0) {
-            User user = userList.get(0);
-            if (userInfoManageService.isUserLogin(user.getUserId())) {
-                return null;
-            }
-            UserInfo userInfo = userInfoManageService.setUser(user);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.putOnce("token", userInfo.getSession().getToken());
-            jsonObject.putOnce("identification", userInfo.getIdentifier().toString());
-            return jsonObject.toString();
+        if (userList == null || userList.size() == 0) {
+            throw new UserNotExistException();
         }
-        return null;
+        User user = userList.get(0);
+        if (userInfoManageService.isUserLogin(user.getUserId())) {
+            throw new ReloginException();
+        }
+        UserInfo userInfo = userInfoManageService.setUser(user);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.putOnce("token", userInfo.getSession().getToken());
+        jsonObject.putOnce("identification", userInfo.getIdentifier().toString());
+        return jsonObject.toString();
     }
 
     @Override
@@ -50,7 +52,7 @@ public class UserLoginServiceImpl implements UserLoginService {
             return false;
         }
         UserSession userSession = userInfoManageService.getUserSessionFromToken(token);
-        if (userInfoManageService.isUserLogin(userSession.getUserId())) {
+        if (userSession == null || !userInfoManageService.isUserLogin(userSession.getUserId())) {
             return false;
         }
         userInfoManageService.removeUserFromSession(userSession);

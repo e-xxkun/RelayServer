@@ -1,6 +1,8 @@
 package com.xxkun.relayserver.controller;
 
 import com.xxkun.relayserver.common.CommonResult;
+import com.xxkun.relayserver.component.exception.ReloginException;
+import com.xxkun.relayserver.component.exception.UserNotExistException;
 import com.xxkun.relayserver.dto.UserLoginParam;
 import com.xxkun.relayserver.service.UserLoginService;
 import io.swagger.annotations.Api;
@@ -21,11 +23,14 @@ public class UserLoginController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
     public CommonResult login(@RequestBody UserLoginParam umsAdminLoginParam, BindingResult result) {
-        String res = userLoginService.login(umsAdminLoginParam.getUsername(), umsAdminLoginParam.getPassword());
-        if (res == null) {
+        try {
+            String res = userLoginService.login(umsAdminLoginParam.getUsername(), umsAdminLoginParam.getPassword());
+            return CommonResult.success(res);
+        } catch (UserNotExistException e) {
             return CommonResult.validateFailed("用户名或密码错误");
+        } catch (ReloginException e) {
+            return CommonResult.validateFailed("重复登录");
         }
-        return CommonResult.success(res);
     }
 
     @ApiOperation(value = "登出")

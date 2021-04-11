@@ -1,5 +1,7 @@
 package com.xxkun.relayserver.service.impl;
 
+import com.xxkun.relayserver.common.TokenProducer;
+import com.xxkun.relayserver.common.Utils;
 import com.xxkun.relayserver.dao.UserIdentifier;
 import com.xxkun.relayserver.dao.UserInfo;
 import com.xxkun.relayserver.dao.UserSession;
@@ -21,7 +23,7 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
 
     @Override
     public boolean isUserLogin(long id) {
-        return redisService.hasKey(redisService.longToString(id));
+        return redisService.hasKey(Utils.longToString(id));
     }
 
     @Override
@@ -31,8 +33,8 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
 
     @Override
     public UserInfo setUser(User user) {
-        String token = UUID.randomUUID().toString();
-        String userIdStr = redisService.longToString(user.getUserId());
+        String token = TokenProducer.get(user.getUserId());
+        String userIdStr = Utils.longToString(user.getUserId());
         redisService.set(token, userIdStr, EXPIRE_TIME);
         UserInfo userInfo = new UserInfo(user.getUserId());
         UserSession userSession = new UserSession(user.getUserId());
@@ -41,7 +43,8 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
         userInfo.setIdentifier(userIdentifier);
         userInfo.setSession(userSession);
         redisService.setHashValue(userIdStr, "IDENTIFIER", userIdentifier.toString());
-        redisService.setHashValue(userIdStr, "STATE", user.getState().getCode());
+        redisService.setHashValue(userIdStr, "STATE", user.getState().getCode() + "");
+        redisService.expire(userIdStr, EXPIRE_TIME);
         return userInfo;
     }
 
@@ -51,7 +54,7 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
         if (idStr == null) {
             return null;
         }
-        long userId = redisService.stringToLong(idStr);
+        long userId = Utils.stringToLong(idStr);
         if (userId < 0) {
             return null;
         }
@@ -63,6 +66,6 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
     @Override
     public void removeUserFromSession(UserSession userSession) {
         redisService.remove(userSession.getToken());
-        redisService.remove(redisService.longToString(userSession.getUserId()));
+        redisService.remove(Utils.longToString(userSession.getUserId()));
     }
 }

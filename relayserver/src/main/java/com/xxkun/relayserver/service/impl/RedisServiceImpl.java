@@ -15,7 +15,7 @@ public class RedisServiceImpl implements RedisService {
     private StringRedisTemplate stringRedisTemplate;
 
     @Override
-    public void setHashValue(String key1, String key2, Object value) {
+    public void setHashValue(String key1, String key2, String value) {
         stringRedisTemplate.opsForHash().put(key1, key2, value);
     }
 
@@ -45,25 +45,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public long stringToLong(String str) {
-        if (str.length() < 4) {
-            return -1;
-        }
-        long tmp = 0;
-        tmp += str.charAt(0);
-        tmp += (long)str.charAt(1) << 16;
-        tmp += (long)str.charAt(2) << 32;
-        tmp += (long)str.charAt(3) << 48;
-        return tmp;
-    }
-
-    @Override
-    public String longToString(long value) {
-        char[] charArr = new char[4];
-        charArr[0] = (char) (value & 0xFFFF);
-        charArr[1] = (char) (value >> 16 & 0xFFFF);
-        charArr[2] = (char) (value >> 32 & 0xFFFF);
-        charArr[3] = (char) (value >> 48 & 0xFFFF);
-        return new String(charArr);
+    public void expire(String key, long time) {
+        stringRedisTemplate.expire(key, time, TimeUnit.SECONDS);
     }
 }
