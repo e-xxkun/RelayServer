@@ -6,17 +6,14 @@ import com.xxkun.relayserver.dao.UserSession;
 import com.xxkun.relayserver.dao.mbg.mapper.UserMapper;
 import com.xxkun.relayserver.dao.mbg.model.User;
 import com.xxkun.relayserver.dao.mbg.model.UserExample;
-import com.xxkun.relayserver.service.RedisService;
 import com.xxkun.relayserver.service.UserInfoManageService;
 import com.xxkun.relayserver.service.UserLoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class UserLoginServiceImpl implements UserLoginService {
@@ -30,12 +27,12 @@ public class UserLoginServiceImpl implements UserLoginService {
     @Override
     public String login(String userId, String password) {
         UserExample userExample = new UserExample();
-        userExample.createCriteria().andUseridEqualTo(userId);
+        userExample.createCriteria().andIdEqualTo(userId);
         userExample.createCriteria().andPasswordEqualTo(password);
         List<User> userList = userMapper.selectByExample(userExample);
         if (userList != null && userList.size() > 0) {
             User user = userList.get(0);
-            if (userInfoManageService.isUserLogin(user.getId())) {
+            if (userInfoManageService.isUserLogin(user.getUserId())) {
                 return null;
             }
             UserInfo userInfo = userInfoManageService.setUser(user);

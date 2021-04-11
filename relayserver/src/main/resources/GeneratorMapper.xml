@@ -4,13 +4,13 @@
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 
 <generatorConfiguration>
-    <classPathEntry location="D:\IDE\apache-maven-3.6.3\repository\mysql\mysql-connector-java\8.0.15\mysql-connector-java-8.0.15.jar" />
+    <classPathEntry location="D:\IDE\Maven\repository\mysql\mysql-connector-java\8.0.15\mysql-connector-java-8.0.15.jar" />
     <context id="MySqlContext" targetRuntime="MyBatis3" defaultModelType="flat">
         <commentGenerator>
             <property name="suppressAllComments" value="true" />
         </commentGenerator>
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3306/p2pchat?useUnicode=true&amp;characterEncoding=utf-8&amp;serverTimezone=Asia/Shanghai&amp;useSSL=false"
+                        connectionURL="jdbc:mysql://localhost:3306/relayserver?useUnicode=true&amp;characterEncoding=utf-8&amp;serverTimezone=Asia/Shanghai&amp;useSSL=false"
                         userId="root"
                         password="xkk0512">
             <!--解决mysql驱动升级到8.0后不生成指定数据库代码的问题-->

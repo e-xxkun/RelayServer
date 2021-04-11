@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -34,10 +32,10 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
     @Override
     public UserInfo setUser(User user) {
         String token = UUID.randomUUID().toString();
-        String userIdStr = redisService.longToString(user.getId());
+        String userIdStr = redisService.longToString(user.getUserId());
         redisService.set(token, userIdStr, EXPIRE_TIME);
-        UserInfo userInfo = new UserInfo(user.getId());
-        UserSession userSession = new UserSession(user.getId());
+        UserInfo userInfo = new UserInfo(user.getUserId());
+        UserSession userSession = new UserSession(user.getUserId());
         userSession.setToken(token);
         UserIdentifier userIdentifier = new UserIdentifier();
         userInfo.setIdentifier(userIdentifier);
