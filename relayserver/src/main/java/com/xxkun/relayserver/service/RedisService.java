@@ -4,7 +4,7 @@ import java.util.Map;
 
 public interface RedisService {
 
-    void setHashValue(String key1, String key2, Object value);
+    void setHashValue(String key1, String key2, String value);
 
     void setHashMap(String key1, Map<?, ?> map);
 
@@ -16,7 +16,5 @@ public interface RedisService {
 
     void remove(String key);
 
-    long stringToLong(String str);
-
-    String longToString(long value);
+    void expire(String key, long time);
 }
