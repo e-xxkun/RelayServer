@@ -4,6 +4,8 @@ import com.xxkun.relayserver.component.BaseThread;
 import com.xxkun.relayserver.component.exception.RequestResolutionException;
 import com.xxkun.relayserver.dao.request.Request;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -16,7 +18,7 @@ import java.util.Date;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Component
-public class RequestListener extends BaseThread {
+public class RequestListener extends BaseThread implements ApplicationRunner {
     @Autowired
     private DatagramSocket receiver;
     @Autowired
@@ -25,12 +27,19 @@ public class RequestListener extends BaseThread {
     private ThreadPoolExecutor requestThreadPool;
 
     @Override
+    public void run(ApplicationArguments args) throws Exception {
+        start();
+    }
+
+    @Override
     public void run() {
         while (!stop) {
+            System.out.println("LISTEN START");
             byte[] inBuff = new byte[Request.UDP_MSG_MAX_LEN];
             DatagramPacket packet = new DatagramPacket(inBuff, inBuff.length);
             try {
                 receiver.receive(packet);
+                System.out.println("RECEIVE: from" + packet.getSocketAddress());
             } catch (IOException e) {
                 e.printStackTrace();
                 continue;
@@ -46,6 +55,7 @@ public class RequestListener extends BaseThread {
             });
         }
     }
+
 
     public interface OnRequest {
         void onRequest(SocketAddress from, Request request);

@@ -37,6 +37,7 @@ public abstract class Message {
 
     public static Message decodeFromRequest(@NonNull Request request) {
         Request.BodyBuffer buffer = request.getBodyBuffer();
+        buffer.position(0);
         int type = buffer.getInt();
         IMessageType messageType = IMessageType.fromTypeCode(type);
         if (messageType == null)

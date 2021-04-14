@@ -20,10 +20,10 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
 
     @Autowired
     private RedisService redisService;
-    @Value("redis.key.expire.EXPIRE_TIME")
-    private long EXPIRE_TIME;
-    @Value("redis.key.expire.EXPIRE_TIME_RATIO")
-    private float EXPIRE_TIME_RATIO;
+    @Value("${redis.key.expire.EXPIRE_TIME}")
+    private Long EXPIRE_TIME;
+    @Value("${redis.key.expire.EXPIRE_TIME_RATIO}")
+    private Float EXPIRE_TIME_RATIO;
 
     @Override
     public UserSession getUserSessionFromToken(String token) {

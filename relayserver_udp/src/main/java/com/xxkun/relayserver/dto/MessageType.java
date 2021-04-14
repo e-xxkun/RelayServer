@@ -12,38 +12,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public enum  MessageType implements IMessageType {
 
-    PUNCH(3, "") {
+    PUNCH(0, "") {
+        @Autowired
+        private PunchMessageHandler punchMsgHandler;
         @Override
         public Message createMessage(Request request) throws MessageResolutionException {
             return new PunchMessage(request);
         }
         @Override
         public IMessageHandler getMessageHandler() {
-            return PUNCH.punchMsgHandler;
+            return punchMsgHandler;
         }
     },
-    HEARTBEAT(4, ""){
+    HEARTBEAT(1, ""){
+        @Autowired
+        private HeartbeatMessageHandler heartbeatMsgHandler;
         @Override
         public Message createMessage(Request request) throws MessageResolutionException {
             return new HeartbeatMessage(request);
         }
         @Override
         public IMessageHandler getMessageHandler() {
-            return HEARTBEAT.heartbeatMsgHandler;
+
+            return heartbeatMsgHandler;
         }
     },
-    REPLY(5, ""),
-    UNKNOWN(7, "");
+    REPLY(2, ""),
+    UNKNOWN(3, "");
 
-    private final long code;
+    private final int code;
     private final String info;
 
-    @Autowired
-    private HeartbeatMessageHandler heartbeatMsgHandler;
-    @Autowired
-    private PunchMessageHandler punchMsgHandler;
-
-    MessageType(long code, String info) {
+    MessageType(int code, String info) {
         this.code = code;
         this.info = info;
     }
@@ -60,7 +60,7 @@ public enum  MessageType implements IMessageType {
     }
 
     @Override
-    public long getCode() {
+    public int getCode() {
         return code;
     }
 

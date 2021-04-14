@@ -9,15 +9,15 @@ import java.util.HashMap;
 
 public interface IMessageType {
 
-    HashMap<Long, IMessageType> typeMap = new HashMap<>();
+    HashMap<Integer, IMessageType> typeMap = new HashMap<>();
 
-    static IMessageType fromTypeCode(long type) {
+    static IMessageType fromTypeCode(int type) {
         return typeMap.get(type);
     }
 
     String getInfo();
 
-    long getCode();
+    int getCode();
 
     Message createMessage(Request request) throws MessageResolutionException;
 

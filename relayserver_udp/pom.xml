@@ -36,11 +36,6 @@
 <!--            <scope>test</scope>-->
 <!--        </dependency>-->
 
-        <!--消息队列相关依赖-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-amqp</artifactId>
-        </dependency>
 
         <!--Redis-->
         <dependency>

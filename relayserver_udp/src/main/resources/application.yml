@@ -23,9 +23,6 @@ udpserver:
 # redis key
 redis:
   key:
-    prefix:
-      REDIS_USER_SESSION_KEY : "REDIS_USER_SESSION_KEY"
-      REDIS_USER_IDENTIFICATION_KEY : "REDIS_USER_IDENTIFICATION_KEY"
     expire:
       EXPIRE_TIME: 120
       EXPIRE_TIME_RATIO: 0.2

@@ -32,6 +32,7 @@ public class HeartbeatMessage extends Message {
     @Override
     protected void decode(Request udpField) throws MessageResolutionException {
         Request.BodyBuffer buffer = udpField.getBodyBuffer();
+        buffer.position(0);
         try {
             // skip the message type byte
             buffer.skip(Integer.BYTES);
