@@ -1,4 +1,4 @@
-package com.xxkun.relayserver.dto;
+package com.xxkun.relayserver.pojo;
 
 import io.swagger.annotations.ApiModelProperty;
 

@@ -1,6 +1,6 @@
 package com.xxkun.relayserver.dao.mbg.model;
 
-import com.xxkun.relayserver.dto.UserStatus;
+import com.xxkun.relayserver.pojo.UserStatus;
 
 public class User {
 

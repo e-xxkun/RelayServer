@@ -1,9 +1,9 @@
-package com.xxkun.relayserver.dao.request;
+package com.xxkun.relayserver.pojo.request;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
-import com.xxkun.relayserver.dao.UserSession;
-import com.xxkun.relayserver.dto.IMessageType;
-import com.xxkun.relayserver.dto.MessageType;
+import com.xxkun.relayserver.pojo.user.UserSession;
+import com.xxkun.relayserver.pojo.IMessageType;
+import com.xxkun.relayserver.pojo.MessageType;
 import org.springframework.lang.NonNull;
 
 public abstract class Message {

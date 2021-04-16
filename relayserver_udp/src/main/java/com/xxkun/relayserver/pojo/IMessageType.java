@@ -1,9 +1,9 @@
-package com.xxkun.relayserver.dto;
+package com.xxkun.relayserver.pojo;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
-import com.xxkun.relayserver.component.handler.IMessageHandler;
-import com.xxkun.relayserver.dao.request.Message;
-import com.xxkun.relayserver.dao.request.Request;
+import com.xxkun.relayserver.component.handler.MessageHandler;
+import com.xxkun.relayserver.pojo.request.Message;
+import com.xxkun.relayserver.pojo.request.Request;
 
 import java.util.HashMap;
 
@@ -21,5 +21,5 @@ public interface IMessageType {
 
     Message createMessage(Request request) throws MessageResolutionException;
 
-    IMessageHandler getMessageHandler();
+    MessageHandler getMessageHandler();
 }

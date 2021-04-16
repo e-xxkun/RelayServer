@@ -1,9 +1,9 @@
 package com.xxkun.relayserver.send;
 
-import com.xxkun.relayserver.dao.response.AckResponse;
-import com.xxkun.relayserver.dao.response.Response;
-import com.xxkun.relayserver.dao.request.Request;
-import com.xxkun.relayserver.dto.ReplyResponseType;
+import com.xxkun.relayserver.pojo.response.AckResponse;
+import com.xxkun.relayserver.pojo.response.Response;
+import com.xxkun.relayserver.pojo.request.Request;
+import com.xxkun.relayserver.pojo.ReplyResponseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -2,9 +2,9 @@ package com.xxkun.relayserver.receive;
 
 import com.xxkun.relayserver.send.ReplyHandler;
 import com.xxkun.relayserver.component.queue.IMessageQueue;
-import com.xxkun.relayserver.dao.request.Message;
-import com.xxkun.relayserver.dao.request.Request;
-import com.xxkun.relayserver.dao.UserSession;
+import com.xxkun.relayserver.pojo.request.Message;
+import com.xxkun.relayserver.pojo.request.Request;
+import com.xxkun.relayserver.pojo.user.UserSession;
 import com.xxkun.relayserver.service.UserInfoManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

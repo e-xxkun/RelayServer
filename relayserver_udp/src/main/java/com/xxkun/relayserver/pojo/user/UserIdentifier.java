@@ -1,4 +1,4 @@
-package com.xxkun.relayserver.dao;
+package com.xxkun.relayserver.pojo.user;
 
 import java.util.UUID;
 

@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.UUID;
 
 public class TokenProducer {
-    @Value("common.token.length")
-    private static Integer TOKEN_LENGTH = 16;
+
+    private final static Integer TOKEN_LENGTH = 16;
 
     public static String get(long userId) {
         String token = UUID.randomUUID().toString();

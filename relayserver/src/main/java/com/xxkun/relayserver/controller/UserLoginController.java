@@ -3,7 +3,7 @@ package com.xxkun.relayserver.controller;
 import com.xxkun.relayserver.common.CommonResult;
 import com.xxkun.relayserver.component.exception.ReloginException;
 import com.xxkun.relayserver.component.exception.UserNotExistException;
-import com.xxkun.relayserver.dto.UserLoginParam;
+import com.xxkun.relayserver.pojo.UserLoginParam;
 import com.xxkun.relayserver.service.UserLoginService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -1,10 +1,11 @@
 package com.xxkun.relayserver.service.impl;
 
-import com.xxkun.relayserver.dao.UserIdentifier;
-import com.xxkun.relayserver.dao.UserInfo;
-import com.xxkun.relayserver.dao.UserSession;
-import com.xxkun.relayserver.dto.NatType;
-import com.xxkun.relayserver.dto.UserStatus;
+import com.xxkun.relayserver.common.TokenProducer;
+import com.xxkun.relayserver.pojo.user.UserIdentifier;
+import com.xxkun.relayserver.pojo.user.UserInfo;
+import com.xxkun.relayserver.pojo.user.UserSession;
+import com.xxkun.relayserver.pojo.NatType;
+import com.xxkun.relayserver.pojo.user.UserStatus;
 import com.xxkun.relayserver.service.RedisService;
 import com.xxkun.relayserver.service.UserInfoManageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
 
     @Override
     public UserSession getUserSessionFromToken(String token) {
-        String idStr = redisService.getValueFromMap("SESSION", token);
+        String idStr = redisService.get(token);
         if (idStr == null) {
             return null;
         }
@@ -69,7 +70,8 @@ public class UserInfoManageServiceImpl implements UserInfoManageService {
         identifierStr = userIdentifier.update();
         redisService.setValueToMap(idStr, "IDENTIFIER", identifierStr);
         info.setIdentifier(userIdentifier);
-        String token = UUID.randomUUID().toString();
+        String token = TokenProducer.get(userSession.getUserId());
+        redisService.expire(idStr, EXPIRE_TIME);
         redisService.set(token, idStr, EXPIRE_TIME);
         redisService.remove(userSession.getToken());
         userSession.setToken(token);

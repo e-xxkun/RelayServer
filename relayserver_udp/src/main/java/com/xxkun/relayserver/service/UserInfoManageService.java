@@ -1,8 +1,7 @@
 package com.xxkun.relayserver.service;
 
-import com.xxkun.relayserver.dao.UserIdentifier;
-import com.xxkun.relayserver.dao.UserSession;
-import com.xxkun.relayserver.dao.UserInfo;
+import com.xxkun.relayserver.pojo.user.UserSession;
+import com.xxkun.relayserver.pojo.user.UserInfo;
 
 public interface UserInfoManageService {
 

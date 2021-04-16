@@ -1,44 +1,31 @@
-package com.xxkun.relayserver.dto;
+package com.xxkun.relayserver.pojo;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
 import com.xxkun.relayserver.component.handler.HeartbeatMessageHandler;
-import com.xxkun.relayserver.component.handler.IMessageHandler;
+import com.xxkun.relayserver.component.handler.MessageHandler;
 import com.xxkun.relayserver.component.handler.PunchMessageHandler;
-import com.xxkun.relayserver.dao.request.Message;
-import com.xxkun.relayserver.dao.request.Request;
-import com.xxkun.relayserver.dao.request.message.HeartbeatMessage;
-import com.xxkun.relayserver.dao.request.message.PunchMessage;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.xxkun.relayserver.pojo.request.Message;
+import com.xxkun.relayserver.pojo.request.Request;
+import com.xxkun.relayserver.pojo.request.message.HeartbeatMessage;
+import com.xxkun.relayserver.pojo.request.message.PunchMessage;
 
 public enum  MessageType implements IMessageType {
 
     PUNCH(0, "") {
-        @Autowired
-        private PunchMessageHandler punchMsgHandler;
         @Override
         public Message createMessage(Request request) throws MessageResolutionException {
             return new PunchMessage(request);
         }
-        @Override
-        public IMessageHandler getMessageHandler() {
-            return punchMsgHandler;
-        }
     },
     HEARTBEAT(1, ""){
-        @Autowired
-        private HeartbeatMessageHandler heartbeatMsgHandler;
         @Override
         public Message createMessage(Request request) throws MessageResolutionException {
             return new HeartbeatMessage(request);
         }
-        @Override
-        public IMessageHandler getMessageHandler() {
-
-            return heartbeatMsgHandler;
-        }
     },
     REPLY(2, ""),
     UNKNOWN(3, "");
+
 
     private final int code;
     private final String info;
@@ -69,8 +56,8 @@ public enum  MessageType implements IMessageType {
         return null;
     }
 
-    @Autowired
-    public IMessageHandler getMessageHandler() {
-        return null;
+    @Override
+    public MessageHandler getMessageHandler() {
+        return MessageHandler.getInstance(this);
     }
 }

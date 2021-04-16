@@ -1,7 +1,7 @@
 package com.xxkun.relayserver.send;
 
 import com.xxkun.relayserver.component.exception.ResponseConvertException;
-import com.xxkun.relayserver.dao.response.Response;
+import com.xxkun.relayserver.pojo.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +43,7 @@ public class ResponseSender implements ResponsePool.OnResponseTimeout {
 
     @Override
     public void onResponseTimeout(Response response) {
+        System.out.println("RESEND: " + response);
         resend(response);
     }
 

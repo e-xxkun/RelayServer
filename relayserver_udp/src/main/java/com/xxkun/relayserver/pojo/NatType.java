@@ -1,4 +1,6 @@
-package com.xxkun.relayserver.dto;
+package com.xxkun.relayserver.pojo;
+
+import com.xxkun.relayserver.pojo.user.UserStatus;
 
 public enum NatType {
     SYMMETRIC(0),

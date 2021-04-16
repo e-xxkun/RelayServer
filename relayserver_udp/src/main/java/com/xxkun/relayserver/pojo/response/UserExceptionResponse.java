@@ -1,7 +1,7 @@
-package com.xxkun.relayserver.dao.response;
+package com.xxkun.relayserver.pojo.response;
 
-import com.xxkun.relayserver.dao.UserInfo;
-import com.xxkun.relayserver.dto.ReplyResponseType;
+import com.xxkun.relayserver.pojo.user.UserInfo;
+import com.xxkun.relayserver.pojo.ReplyResponseType;
 
 import java.net.InetSocketAddress;
 import java.util.List;

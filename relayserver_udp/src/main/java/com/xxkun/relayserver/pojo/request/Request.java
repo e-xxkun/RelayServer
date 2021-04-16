@@ -1,4 +1,4 @@
-package com.xxkun.relayserver.dao.request;
+package com.xxkun.relayserver.pojo.request;
 
 import com.xxkun.relayserver.component.exception.RequestResolutionException;
 import org.springframework.beans.factory.annotation.Value;

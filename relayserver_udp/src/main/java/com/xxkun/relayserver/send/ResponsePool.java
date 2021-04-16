@@ -1,15 +1,12 @@
 package com.xxkun.relayserver.send;
 
 import com.xxkun.relayserver.component.BaseThread;
-import com.xxkun.relayserver.dao.UserInfo;
-import com.xxkun.relayserver.dao.request.Request;
-import com.xxkun.relayserver.dao.response.*;
-import com.xxkun.relayserver.dao.UserClient;
+import com.xxkun.relayserver.pojo.response.*;
+import com.xxkun.relayserver.pojo.UserClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 
@@ -90,9 +87,10 @@ public class ResponsePool {
     public class ResponseTimeoutListenThread extends BaseThread {
         @Override
         public void run() {
-            while (stop) {
+            while (!stop) {
                 try {
                     Response response = responseQueue.take();
+                    System.out.println("DELAY: " + response);
                     if (isTimeout(response)) {
                         onResponseTimeout.onResponseTimeout(response);
                     }

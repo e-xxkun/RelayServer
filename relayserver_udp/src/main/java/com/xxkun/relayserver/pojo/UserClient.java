@@ -1,15 +1,16 @@
-package com.xxkun.relayserver.dao;
+package com.xxkun.relayserver.pojo;
 
-import com.xxkun.relayserver.dao.response.Response;
+import com.xxkun.relayserver.pojo.response.Response;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class UserClient {
-    private final Map<Response, Object> responseSet;
+    private final Set<Response> responseSet;
 
     private final InetSocketAddress socketAddress;
 
@@ -18,19 +19,19 @@ public class UserClient {
     public UserClient(InetSocketAddress socketAddress) {
         this.socketAddress = socketAddress;
         this.curSequence = new AtomicLong(new Random().nextLong() % 256);
-        responseSet = new ConcurrentHashMap<>();
+        responseSet = ConcurrentHashMap.newKeySet();
     }
 
     public void addResponse(Response response) {
-        responseSet.put(response, null);
+        responseSet.add(response);
     }
 
     public boolean removeResponse(Response response) {
-        return responseSet.remove(response) == null;
+        return responseSet.remove(response);
     }
 
     public boolean containsResponse(Response response) {
-        return responseSet.containsKey(response);
+        return responseSet.contains(response);
     }
 
     public long getCurSequence() {

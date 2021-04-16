@@ -1,4 +1,4 @@
-package com.xxkun.relayserver.dto;
+package com.xxkun.relayserver.pojo.user;
 
 public enum UserStatus {
     ONLINE(0) {

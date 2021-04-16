@@ -1,6 +1,6 @@
 package com.xxkun.relayserver.config;
 
-import com.xxkun.relayserver.dto.MessageType;
+import com.xxkun.relayserver.pojo.MessageType;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;

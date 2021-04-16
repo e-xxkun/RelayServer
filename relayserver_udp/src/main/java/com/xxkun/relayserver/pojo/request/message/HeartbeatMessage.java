@@ -1,9 +1,9 @@
-package com.xxkun.relayserver.dao.request.message;
+package com.xxkun.relayserver.pojo.request.message;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
-import com.xxkun.relayserver.dao.request.Message;
-import com.xxkun.relayserver.dao.request.Request;
-import com.xxkun.relayserver.dto.MessageType;
+import com.xxkun.relayserver.pojo.request.Message;
+import com.xxkun.relayserver.pojo.request.Request;
+import com.xxkun.relayserver.pojo.MessageType;
 
 import java.nio.BufferUnderflowException;
 

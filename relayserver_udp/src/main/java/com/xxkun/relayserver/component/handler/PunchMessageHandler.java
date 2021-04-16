@@ -1,11 +1,12 @@
 package com.xxkun.relayserver.component.handler;
 
-import com.xxkun.relayserver.dao.UserInfo;
-import com.xxkun.relayserver.dao.request.Message;
-import com.xxkun.relayserver.dao.request.message.PunchMessage;
-import com.xxkun.relayserver.dao.response.PunchResponse;
-import com.xxkun.relayserver.dao.response.UserExceptionResponse;
-import com.xxkun.relayserver.dto.ReplyResponseType;
+import com.xxkun.relayserver.pojo.MessageType;
+import com.xxkun.relayserver.pojo.user.UserInfo;
+import com.xxkun.relayserver.pojo.request.Message;
+import com.xxkun.relayserver.pojo.request.message.PunchMessage;
+import com.xxkun.relayserver.pojo.response.PunchResponse;
+import com.xxkun.relayserver.pojo.response.UserExceptionResponse;
+import com.xxkun.relayserver.pojo.ReplyResponseType;
 import com.xxkun.relayserver.send.ResponsePool;
 import com.xxkun.relayserver.send.ResponseSender;
 import com.xxkun.relayserver.service.UserInfoManageService;
@@ -16,13 +17,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class PunchMessageHandler implements IMessageHandler{
+public class PunchMessageHandler extends MessageHandler {
     @Autowired
     private UserInfoManageService userInfoManageService;
     @Autowired
     private ResponsePool responsePool;
     @Autowired
     private ResponseSender responseSender;
+
+    @Override
+    public MessageType getMessageType() {
+        return MessageType.PUNCH;
+    }
+
     @Override
     public void consume(Message message) {
         PunchMessage punchMessage = (PunchMessage) message;

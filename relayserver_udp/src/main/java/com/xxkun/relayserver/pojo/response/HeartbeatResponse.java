@@ -1,8 +1,7 @@
-package com.xxkun.relayserver.dao.response;
+package com.xxkun.relayserver.pojo.response;
 
 import com.xxkun.relayserver.component.exception.ResponseConvertException;
-import com.xxkun.relayserver.dao.UserInfo;
-import com.xxkun.relayserver.dao.UserSession;
+import com.xxkun.relayserver.pojo.user.UserInfo;
 
 import java.net.InetSocketAddress;
 

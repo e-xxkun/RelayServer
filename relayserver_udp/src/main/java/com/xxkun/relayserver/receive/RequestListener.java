@@ -2,7 +2,7 @@ package com.xxkun.relayserver.receive;
 
 import com.xxkun.relayserver.component.BaseThread;
 import com.xxkun.relayserver.component.exception.RequestResolutionException;
-import com.xxkun.relayserver.dao.request.Request;
+import com.xxkun.relayserver.pojo.request.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

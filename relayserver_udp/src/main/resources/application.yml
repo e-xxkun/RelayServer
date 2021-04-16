@@ -24,7 +24,7 @@ udpserver:
 redis:
   key:
     expire:
-      EXPIRE_TIME: 120
-      EXPIRE_TIME_RATIO: 0.2
+      EXPIRE_TIME: 300
+      EXPIRE_TIME_RATIO: 0.8
 
 

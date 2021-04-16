@@ -1,7 +1,6 @@
-package com.xxkun.relayserver.dao;
+package com.xxkun.relayserver.pojo.user;
 
-import com.xxkun.relayserver.dto.NatType;
-import com.xxkun.relayserver.dto.UserStatus;
+import com.xxkun.relayserver.pojo.NatType;
 
 import java.net.InetSocketAddress;
 

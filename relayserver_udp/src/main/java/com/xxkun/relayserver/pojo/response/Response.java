@@ -1,4 +1,4 @@
-package com.xxkun.relayserver.dao.response;
+package com.xxkun.relayserver.pojo.response;
 
 import com.xxkun.relayserver.component.exception.ResponseConvertException;
 

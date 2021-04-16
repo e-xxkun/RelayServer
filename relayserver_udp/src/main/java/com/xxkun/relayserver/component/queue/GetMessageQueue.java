@@ -1,7 +1,7 @@
 package com.xxkun.relayserver.component.queue;
 
 import com.xxkun.relayserver.component.BaseThread;
-import com.xxkun.relayserver.dao.request.Message;
+import com.xxkun.relayserver.pojo.request.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
