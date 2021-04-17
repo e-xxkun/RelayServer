@@ -34,6 +34,7 @@ public class TransferServer implements TransferPool.OnPacketConfirmTimeout {
 
     public void send(TransferPacket packet, boolean needACK) throws IOException {
         if (needACK) {
+            packet.setSendTime(System.currentTimeMillis());
             pool.addUnconfirmedPacket(packet);
         }
         socket.send(packet.getDatagramPacket());
@@ -44,6 +45,10 @@ public class TransferServer implements TransferPool.OnPacketConfirmTimeout {
         while (true) {
             socket.receive(packet);
             TransferPacket transferPacket = TransferPacket.decodeFromDatagramPacket(packet);
+            if (transferPacket == null) {
+                continue;
+            }
+            transferPacket.setReceiveTime(System.currentTimeMillis());
             if (transferPacket.isACK()) {
                 pool.confirm(transferPacket);
             } else {

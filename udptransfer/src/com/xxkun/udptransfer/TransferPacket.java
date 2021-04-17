@@ -21,8 +21,8 @@ public class TransferPacket implements Delayed {
 
     private String id;
     private long rtt;
-    private Date receiveDate;
-    private Date sendDate;
+    private long receiveTime;
+    private long sendTime;
 
     private final ByteBuffer buffer;
 
@@ -102,20 +102,20 @@ public class TransferPacket implements Delayed {
         this.rtt = rtt;
     }
 
-    public Date getReceiveDate() {
-        return receiveDate;
+    public long getReceiveTime() {
+        return receiveTime;
     }
 
-    public void setReceiveDate(Date date) {
-        this.receiveDate = date;
+    public void setReceiveTime(long time) {
+        this.receiveTime = time;
     }
 
-    public Date getSendDate() {
-        return sendDate;
+    public long getSendTime() {
+        return sendTime;
     }
 
-    public void setSendDate(Date date) {
-        this.sendDate = date;
+    public void setSendTime(long time) {
+        this.sendTime = time;
     }
 
 
@@ -135,7 +135,7 @@ public class TransferPacket implements Delayed {
 
     @Override
     public int compareTo(Delayed o) {
-        return (sendDate.getTime() - ((TransferPacket) o).sendDate.getTime()
+        return (sendTime - ((TransferPacket) o).sendTime
                 + getDelay(TimeUnit.SECONDS) -  o.getDelay(TimeUnit.SECONDS)) <= 0 ? -1 : 1;
     }
 
