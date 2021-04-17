@@ -20,6 +20,7 @@ public class TransferPacket implements Delayed {
     private int bodyLength = TransferServer.MAX_TRANSFER_LEN - HEAD_LEN;
 
     private String id;
+    private long rtt;
     private Date receiveDate;
     private Date sendDate;
 
@@ -97,6 +98,10 @@ public class TransferPacket implements Delayed {
         }
     }
 
+    public void setRtt(long rtt) {
+        this.rtt = rtt;
+    }
+
     public Date getReceiveDate() {
         return receiveDate;
     }
@@ -125,12 +130,13 @@ public class TransferPacket implements Delayed {
 
     @Override
     public long getDelay(TimeUnit unit) {
-        return 0;
+        return rtt;
     }
 
     @Override
     public int compareTo(Delayed o) {
-        return 0;
+        return (sendDate.getTime() - ((TransferPacket) o).sendDate.getTime()
+                + getDelay(TimeUnit.SECONDS) -  o.getDelay(TimeUnit.SECONDS)) <= 0 ? -1 : 1;
     }
 
     @Override
