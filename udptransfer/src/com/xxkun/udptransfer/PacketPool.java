@@ -75,9 +75,6 @@ public class PacketPool {
         return ackPacket;
     }
 
-    public void removePacket(TransferPacket packet) {
-    }
-
     public interface OnPacketConfirmTimeout {
         void onPacketConfirmTimeout(TransferPacket packet);
     }
@@ -107,9 +104,13 @@ public class PacketPool {
 
         public void removePacket(TransferPacket packet) {
             TransferPacket srcPacket = packetMap.remove(packet);
-            if (srcPacket != null && packet.getReceiveTime() != null) {
-                packet.setSendTime(srcPacket.getSendTime());
-                updateRtt(packet);
+            if (srcPacket != null) {
+                if (packet.getReceiveTime() == null) {
+                    packetTimeout();
+                } else {
+                    packet.setSendTime(srcPacket.getSendTime());
+                    updateRtt(packet);
+                }
             }
         }
 
@@ -133,7 +134,7 @@ public class PacketPool {
         }
 
 //        https://www.cnblogs.com/lshs/p/6038535.html
-        public void packetTimeout() {
+        private void packetTimeout() {
             SRTT = null;
             DevRTT = null;
             RTO <<= 1;
@@ -183,7 +184,6 @@ public class PacketPool {
                     Client client = clientMap.get(packet.getSocketAddress());
                     if (client != null && !hasConfirmed(packet)) {
                         client.removePacket(packet);
-                        client.packetTimeout();
                         if (onPacketConfirmTimeout != null) {
                             onPacketConfirmTimeout.onPacketConfirmTimeout(packet);
                         }

@@ -17,7 +17,6 @@ public class Client {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-
     }
 
     static class Receiver extends Thread {
