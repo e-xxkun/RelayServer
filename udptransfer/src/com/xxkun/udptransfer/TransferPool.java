@@ -29,7 +29,6 @@ public class TransferPool {
     }
 
     public void addUnconfirmedPacket(TransferPacket packet) {
-        packetQueue.add(packet);
         Client client = clientMap.get(packet.getSocketAddress());
         if (client == null) {
             client = new Client(packet.getSocketAddress());
@@ -39,6 +38,7 @@ public class TransferPool {
             packet.setSequence(client.getCurSequence());
         }
         client.addPacket(packet);
+        packetQueue.add(packet);
     }
 
     public void confirm(TransferPacket packet) {
@@ -69,15 +69,24 @@ public class TransferPool {
         this.onPacketConfirmTimeout = onPacketConfirmTimeout;
     }
 
+    public TransferPacket createACKPacket(TransferPacket packet) {
+        byte[] data = new byte[TransferPacket.HEAD_LEN];
+        TransferPacket ackPacket = new TransferPacket(data, packet.getSocketAddress(), true);
+        ackPacket.setSequence(packet.getSequence());
+        return ackPacket;
+    }
+
     public interface OnPacketConfirmTimeout {
         void onPacketConfirmTimeout(TransferPacket packet);
     }
 
     private static class Client {
 
+        public static final long MAX_RTT = 30L;
         private final Set<TransferPacket> packetSet;
         private final InetSocketAddress socketAddress;
         private final AtomicLong curSequence;
+        private long rtt = MAX_RTT;
 
         public Client(InetSocketAddress socketAddress) {
             this.socketAddress = socketAddress;
@@ -87,10 +96,25 @@ public class TransferPool {
 
         public void addPacket(TransferPacket packet) {
             packetSet.add(packet);
+            packet.setRtt(rtt);
+        }
+
+        public long getRtt() {
+            return rtt;
+        }
+
+        public void setRtt(long rtt) {
+            this.rtt = rtt;
         }
 
         public void removePacket(TransferPacket packet) {
-            packetSet.remove(packet);
+            if (packetSet.remove(packet) && packet.getReceiveTime() != null) {
+                updateRtt(packet);
+            }
+        }
+
+        private void updateRtt(TransferPacket packet) {
+
         }
 
         public boolean containsPacket(TransferPacket packet) {
@@ -132,14 +156,17 @@ public class TransferPool {
             while (!stop) {
                 try {
                     TransferPacket packet = packetQueue.take();
-//                    System.out.println("DELAY: " + response);
+                    Client client = clientMap.get(packet.getSocketAddress());
+                    if (client != null) {
+                        client.removePacket(packet);
+                    }
                     if (onPacketConfirmTimeout != null && !hasConfirmed(packet)) {
                         onPacketConfirmTimeout.onPacketConfirmTimeout(packet);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(40);
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }

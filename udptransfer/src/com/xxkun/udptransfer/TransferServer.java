@@ -10,8 +10,9 @@ public class TransferServer implements TransferPool.OnPacketConfirmTimeout {
     public final static int MAX_TRANSFER_LEN = 512;
 
     private DatagramSocket socket;
-
     private TransferPool pool;
+
+    private OnPacketReachMaxResendTime onPacketReachMaxResendTime;
 
     public TransferServer(int port) throws SocketException {
         socket = new DatagramSocket(port);
@@ -58,12 +59,17 @@ public class TransferServer implements TransferPool.OnPacketConfirmTimeout {
         }
     }
 
-    private void sendACK(TransferPacket transferPacket) {
+    private void sendACK(TransferPacket packet) throws IOException {
+        TransferPacket ackPacket = pool.createACKPacket(packet);
+        send(ackPacket, false);
     }
 
     @Override
     public void onPacketConfirmTimeout(TransferPacket packet) {
         if (packet.isMaxResendTime()) {
+            if (onPacketReachMaxResendTime != null) {
+                onPacketReachMaxResendTime.onPacketReachMaxResendTime(packet);
+            }
             return;
         }
         packet.incResendTime();
@@ -72,5 +78,13 @@ public class TransferServer implements TransferPool.OnPacketConfirmTimeout {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setOnPacketReachMaxResendTime(OnPacketReachMaxResendTime onPacketReachMaxResendTime) {
+        this.onPacketReachMaxResendTime = onPacketReachMaxResendTime;
+    }
+
+    public interface OnPacketReachMaxResendTime {
+        void onPacketReachMaxResendTime(TransferPacket packet);
     }
 }

@@ -3,33 +3,33 @@ package com.xxkun.udptransfer;
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.util.Date;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
 public class TransferPacket implements Delayed {
+
     private static final int HEAD = 0xFEFDDFEB;
     // HEAD|sequence|type|bodyLength -> int|long|byte|int
-    private static final int HEAD_LEN = Integer.BYTES + Long.BYTES + Byte.BYTES + Integer.BYTES;
+    public static final int HEAD_LEN = Integer.BYTES + Long.BYTES + Byte.BYTES + Integer.BYTES;
     private static int MAX_RESEND_TIME = 4;
 
     private Long sequence;
     private int resendTime = 0;
     private final Type type;
     private InetSocketAddress socketAddress;
-    private int bodyLength = TransferServer.MAX_TRANSFER_LEN - HEAD_LEN;
+    private int bodyLength = 0;
 
     private String id;
     private long rtt;
-    private long receiveTime;
-    private long sendTime;
+    private Long receiveTime;
+    private Long sendTime;
 
     private final ByteBuffer buffer;
 
     public TransferPacket(byte[] data, InetSocketAddress socketAddress) {
         this(data, socketAddress, false);
     }
-    
+
     public TransferPacket(byte[] data, InetSocketAddress socketAddress, boolean isACK) {
         this(data, socketAddress, isACK ? Type.ACK : Type.GET);
     }
@@ -86,9 +86,21 @@ public class TransferPacket implements Delayed {
         return false;
     }
 
-    public void setSequence(long sequence) {
+    public void setSequence(Long sequence) {
         this.sequence = sequence;
         refreshId();
+    }
+
+    public Long getSequence() {
+        return sequence;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public ByteBuffer getBuffer() {
+        return buffer;
     }
 
     private void refreshId() {
@@ -102,27 +114,25 @@ public class TransferPacket implements Delayed {
         this.rtt = rtt;
     }
 
-    public long getReceiveTime() {
+    public Long getReceiveTime() {
         return receiveTime;
     }
 
-    public void setReceiveTime(long time) {
+    public void setReceiveTime(Long time) {
         this.receiveTime = time;
     }
 
-    public long getSendTime() {
+    public Long getSendTime() {
         return sendTime;
     }
 
-    public void setSendTime(long time) {
+    public void setSendTime(Long time) {
         this.sendTime = time;
     }
-
 
     public static void setMaxResendTime(int maxResendTime) {
         MAX_RESEND_TIME = maxResendTime;
     }
-
 
     public static TransferPacket decodeFromDatagramPacket(DatagramPacket packet) {
         return null;
