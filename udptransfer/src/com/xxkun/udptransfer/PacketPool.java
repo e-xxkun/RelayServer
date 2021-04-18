@@ -4,19 +4,18 @@ import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class TransferPool {
+public class PacketPool {
 
     private final DelayQueue<TransferPacket> packetQueue;
     private final Map<InetSocketAddress, Client> clientMap;
     private final TimeoutListenThread timeoutListenThread;
     private OnPacketConfirmTimeout onPacketConfirmTimeout;
 
-    public TransferPool() {
+    public PacketPool() {
         packetQueue = new DelayQueue<>();
         clientMap = new ConcurrentHashMap<>();
         timeoutListenThread = new TimeoutListenThread();
@@ -76,49 +75,74 @@ public class TransferPool {
         return ackPacket;
     }
 
+    public void removePacket(TransferPacket packet) {
+    }
+
     public interface OnPacketConfirmTimeout {
         void onPacketConfirmTimeout(TransferPacket packet);
     }
 
     private static class Client {
 
-        public static final long MAX_RTT = 30L;
-        private final Set<TransferPacket> packetSet;
+        private static final long MAX_RTO = 60 * 1000L;
+        private static final long MIN_RTO = 200L;
+        private Long SRTT;
+        private Long DevRTT;
+        private long RTO = 1000L;
+
+        private final Map<TransferPacket, TransferPacket> packetMap;
         private final InetSocketAddress socketAddress;
         private final AtomicLong curSequence;
-        private long rtt = MAX_RTT;
 
         public Client(InetSocketAddress socketAddress) {
             this.socketAddress = socketAddress;
             this.curSequence = new AtomicLong(new Random().nextLong() % 256);
-            packetSet = ConcurrentHashMap.newKeySet();
+            packetMap = new ConcurrentHashMap<>();
         }
 
         public void addPacket(TransferPacket packet) {
-            packetSet.add(packet);
-            packet.setRtt(rtt);
-        }
-
-        public long getRtt() {
-            return rtt;
-        }
-
-        public void setRtt(long rtt) {
-            this.rtt = rtt;
+            packet.setRTO(RTO);
+            packetMap.put(packet, packet);
         }
 
         public void removePacket(TransferPacket packet) {
-            if (packetSet.remove(packet) && packet.getReceiveTime() != null) {
+            TransferPacket srcPacket = packetMap.remove(packet);
+            if (srcPacket != null && packet.getReceiveTime() != null) {
+                packet.setSendTime(srcPacket.getSendTime());
                 updateRtt(packet);
             }
         }
 
+//        https://www.cnblogs.com/lshs/p/6038535.html
+//        alpha = 1/8  beta = 1/4  K = 4
+//        DevRTT = (1-beta) * DevRTT + beta *(|RTT - SRTT|)
+//        SRTT = (1 - alpha) * SRTT + alpha * (RTT - SRTT);
+//        RTO = SRTT + K * DevRTT
         private void updateRtt(TransferPacket packet) {
+            long RTT = packet.getSendTime() - packet.getReceiveTime();
+            if (SRTT == null) {
+                SRTT = RTT;
+                DevRTT = RTT >> 1;
+            } else {
+                DevRTT = DevRTT - (DevRTT >> 2) + (Math.abs(RTT - SRTT) >> 2);
+                SRTT = SRTT - (SRTT >> 3) + ((RTT - SRTT) >> 3);
+            }
+            RTO = SRTT + (DevRTT << 2);
+            RTO = Math.max(RTO, MIN_RTO);
+            RTO = Math.min(RTO, MAX_RTO);
+        }
 
+//        https://www.cnblogs.com/lshs/p/6038535.html
+        public void packetTimeout() {
+            SRTT = null;
+            DevRTT = null;
+            RTO <<= 1;
+            RTO = Math.min(RTO, MAX_RTO);
+            RTO = Math.max(RTO, 3 * 1000L);
         }
 
         public boolean containsPacket(TransferPacket packet) {
-            return packetSet.contains(packet);
+            return packetMap.containsKey(packet);
         }
 
         public long getCurSequence() {
@@ -126,7 +150,7 @@ public class TransferPool {
         }
 
         public int packetCount() {
-            return packetSet.size();
+            return packetMap.size();
         }
 
         public InetSocketAddress getSocketAddress() {
@@ -157,11 +181,12 @@ public class TransferPool {
                 try {
                     TransferPacket packet = packetQueue.take();
                     Client client = clientMap.get(packet.getSocketAddress());
-                    if (client != null) {
+                    if (client != null && !hasConfirmed(packet)) {
                         client.removePacket(packet);
-                    }
-                    if (onPacketConfirmTimeout != null && !hasConfirmed(packet)) {
-                        onPacketConfirmTimeout.onPacketConfirmTimeout(packet);
+                        client.packetTimeout();
+                        if (onPacketConfirmTimeout != null) {
+                            onPacketConfirmTimeout.onPacketConfirmTimeout(packet);
+                        }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

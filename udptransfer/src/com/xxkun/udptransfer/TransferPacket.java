@@ -20,11 +20,15 @@ public class TransferPacket implements Delayed {
     private int bodyLength = 0;
 
     private String id;
-    private long rtt;
+    private long RTO;
     private Long receiveTime;
     private Long sendTime;
 
     private final ByteBuffer buffer;
+
+    public TransferPacket(InetSocketAddress socketAddress) {
+        this(new byte[TransferServer.MAX_TRANSFER_LEN], socketAddress, false);
+    }
 
     public TransferPacket(byte[] data, InetSocketAddress socketAddress) {
         this(data, socketAddress, false);
@@ -100,6 +104,7 @@ public class TransferPacket implements Delayed {
     }
 
     public ByteBuffer getBuffer() {
+        buffer.position(HEAD_LEN);
         return buffer;
     }
 
@@ -110,8 +115,8 @@ public class TransferPacket implements Delayed {
         }
     }
 
-    public void setRtt(long rtt) {
-        this.rtt = rtt;
+    public void setRTO(long RTO) {
+        this.RTO = RTO;
     }
 
     public Long getReceiveTime() {
@@ -140,7 +145,7 @@ public class TransferPacket implements Delayed {
 
     @Override
     public long getDelay(TimeUnit unit) {
-        return rtt;
+        return RTO;
     }
 
     @Override

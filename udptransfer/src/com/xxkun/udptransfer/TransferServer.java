@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Date;
 
-public class TransferServer implements TransferPool.OnPacketConfirmTimeout {
+public class TransferServer implements PacketPool.OnPacketConfirmTimeout {
 
     public final static int MAX_TRANSFER_LEN = 512;
 
     private DatagramSocket socket;
-    private TransferPool pool;
+    private PacketPool pool;
 
     private OnPacketReachMaxResendTime onPacketReachMaxResendTime;
 
@@ -25,7 +26,7 @@ public class TransferServer implements TransferPool.OnPacketConfirmTimeout {
     }
 
     private void init() {
-        pool = new TransferPool();
+        pool = new PacketPool();
         pool.setOnPacketConfirmTimeout(this);
     }
 
