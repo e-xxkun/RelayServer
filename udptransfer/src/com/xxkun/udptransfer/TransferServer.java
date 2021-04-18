@@ -3,6 +3,7 @@ package com.xxkun.udptransfer;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Date;
 
@@ -34,19 +35,20 @@ public class TransferServer implements PacketPool.OnPacketConfirmTimeout {
         send(packet, true);
     }
 
-    public void send(TransferPacket packet, boolean needACK) throws IOException {
+    private void send(TransferPacket packet, boolean needACK) throws IOException {
         if (needACK) {
             packet.setSendTime(System.currentTimeMillis());
             pool.addUnconfirmedPacket(packet);
         }
-        socket.send(packet.getDatagramPacket());
+        DatagramPacket datagramPacket = new DatagramPacket(packet.convertToByteArray(), packet.length(), packet.getSocketAddress());
+        socket.send(datagramPacket);
     }
 
     public TransferPacket receive() throws IOException {
         DatagramPacket packet = pool.createPacket();
         while (true) {
             socket.receive(packet);
-            TransferPacket transferPacket = TransferPacket.decodeFromDatagramPacket(packet);
+            TransferPacket transferPacket = TransferPacket.decodeFromByteArray(packet.getData(), (InetSocketAddress) packet.getSocketAddress());
             if (transferPacket == null) {
                 continue;
             }

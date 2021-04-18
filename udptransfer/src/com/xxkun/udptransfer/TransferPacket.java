@@ -1,6 +1,5 @@
 package com.xxkun.udptransfer;
 
-import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Delayed;
@@ -15,9 +14,9 @@ public class TransferPacket implements Delayed {
 
     private Long sequence;
     private int resendTime = 0;
-    private final Type type;
     private InetSocketAddress socketAddress;
     private int bodyLength = 0;
+    private final Type type;
 
     private String id;
     private long RTO;
@@ -39,22 +38,14 @@ public class TransferPacket implements Delayed {
     }
 
     public TransferPacket(byte[] data, InetSocketAddress socketAddress, Type type) {
+        this(ByteBuffer.wrap(data), socketAddress, type);
+    }
+
+    public TransferPacket(ByteBuffer buffer, InetSocketAddress socketAddress, Type type) {
         this.socketAddress = socketAddress;
-        buffer = ByteBuffer.wrap(data);
+        this.buffer = buffer;
         this.type = type;
-    }
-
-    public byte[] convertToByteArray() {
-        buffer.position(0);
-        buffer.putInt(HEAD);
-        buffer.putLong(sequence);
-        buffer.put(type.getCode());
-        buffer.putInt(getBodyLength());
-        return buffer.array();
-    }
-
-    public DatagramPacket getDatagramPacket() {
-        return new DatagramPacket(convertToByteArray(), getBodyLength(), socketAddress);
+        refreshId();
     }
 
     public void setBodyLength(int bodyLength) {
@@ -63,6 +54,10 @@ public class TransferPacket implements Delayed {
 
     public int getBodyLength() {
         return bodyLength;
+    }
+
+    public int length() {
+        return HEAD_LEN + bodyLength;
     }
 
     public boolean isACK() {
@@ -108,13 +103,6 @@ public class TransferPacket implements Delayed {
         return buffer;
     }
 
-    private void refreshId() {
-        id = socketAddress.toString();
-        if (sequence != null) {
-            id += sequence;
-        }
-    }
-
     public void setRTO(long RTO) {
         this.RTO = RTO;
     }
@@ -139,8 +127,41 @@ public class TransferPacket implements Delayed {
         MAX_RESEND_TIME = maxResendTime;
     }
 
-    public static TransferPacket decodeFromDatagramPacket(DatagramPacket packet) {
-        return null;
+    private void refreshId() {
+        id = socketAddress.toString();
+        if (sequence != null) {
+            id += sequence;
+        }
+    }
+
+    public byte[] convertToByteArray() {
+        buffer.position(0);
+        buffer.putInt(HEAD);
+        buffer.putLong(sequence);
+        buffer.put(type.getCode());
+        buffer.putInt(getBodyLength());
+        return buffer.array();
+    }
+
+    public static TransferPacket decodeFromByteArray(byte[] data, InetSocketAddress socketAddress) {
+        ByteBuffer buffer = ByteBuffer.wrap(data);
+        if (buffer.getInt() != HEAD) {
+          return null;
+        }
+        long sequence = buffer.getLong();
+        if (sequence < 0) {
+            return null;
+        }
+        int code = buffer.get();
+        Type type = Type.fromCode(code);
+        int bodyLength = buffer.getInt();
+        if (bodyLength < 0) {
+            return null;
+        }
+        TransferPacket packet = new TransferPacket(buffer, socketAddress, type);
+        packet.setSequence(sequence);
+        packet.setBodyLength(bodyLength);
+        return packet;
     }
 
     @Override
@@ -188,6 +209,13 @@ public class TransferPacket implements Delayed {
 
         public boolean isACK() {
             return false;
+        }
+
+        public static Type fromCode(int code) {
+            if (code >= 0 && code < Type.values().length) {
+                return Type.values()[code];
+            }
+            return GET;
         }
     }
 }

@@ -96,7 +96,7 @@ public class PacketPool {
 
         public Client(InetSocketAddress socketAddress) {
             this.socketAddress = socketAddress;
-            this.curSequence = new AtomicLong(new Random().nextLong() % 256);
+            this.curSequence = new AtomicLong(new Random().nextInt(256));
             packetMap = new ConcurrentHashMap<>();
         }
 
