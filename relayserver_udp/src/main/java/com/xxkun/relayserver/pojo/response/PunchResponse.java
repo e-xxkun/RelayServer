@@ -1,7 +1,9 @@
 package com.xxkun.relayserver.pojo.response;
 
 import com.xxkun.relayserver.component.exception.ResponseConvertException;
+import com.xxkun.relayserver.pojo.ResponseType;
 import com.xxkun.relayserver.pojo.user.UserInfo;
+import com.xxkun.udptransfer.TransferPacket;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -53,18 +55,18 @@ public class PunchResponse extends Response {
     }
 
     @Override
-    protected void overwriteToByteArray(BodyBuffer bodyBuffer) throws ResponseConvertException {
+    protected void overwrite(TransferPacket.BodyBuffer bodyBuffer) {
+        int curPosition = bodyBuffer.position();
         bodyLength = 0;
-        bodyBuffer.skip(Integer.BYTES);
         int i = index;
         for (;i < userInfos.size() && bodyLength < bodyBuffer.limit();i ++) {
             UserInfo info = userInfos.get(i);
-            bodyBuffer.writeLong(info.getUserId());
-            bodyBuffer.writeString(info.getNameUrl());
+            bodyBuffer.putLong(info.getUserId());
+            bodyBuffer.putString(info.getNameUrl());
             bodyLength += info.bytesLength();
         }
-        bodyBuffer.position(0);
-        bodyBuffer.writeInt(i - index);
+        bodyBuffer.position(curPosition);
+        bodyBuffer.putInt(i - index);
         index = i;
     }
 }

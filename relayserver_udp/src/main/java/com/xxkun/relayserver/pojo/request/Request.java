@@ -1,6 +1,8 @@
 package com.xxkun.relayserver.pojo.request;
 
 import com.xxkun.relayserver.component.exception.RequestResolutionException;
+import com.xxkun.relayserver.pojo.RequestType;
+import com.xxkun.udptransfer.TransferPacket;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 
@@ -11,193 +13,54 @@ import java.util.Date;
 
 public final class Request {
 
-    @Value("udpserver.MSG_BUFF_LEN.request")
-    public static final int UDP_MSG_MAX_LEN = 512;
-
-    private static final int MAX_RESEND_TIME = 4;
-
-    private static final int HEAD = 0xFEFDDFEB;
-
-    private static final int HEAD_LEN = 4 * Integer.BYTES + Long.BYTES;
-
-    private long sequence;
-
-    private Date receiveDate;
-
+    private final static int HEAD_LEN = 2 * Integer.BYTES;
     private final InetSocketAddress socketAddress;
-
+    private final int clientVersion;
     private final RequestType type;
+    private final TransferPacket.BodyBuffer bodyBuffer;
 
-    private final Integer clientVersion;
-
-    private final BodyBuffer bodyBuffer;
-
-    private Request(ByteBuffer buffer, Long seq, Integer clientVersion, Integer cmdId, Integer bodyLength, @NonNull InetSocketAddress socketAddress) {
-        this.bodyBuffer = new BodyBuffer(buffer, bodyLength);
-        this.sequence = seq;
+    private Request(TransferPacket.BodyBuffer buffer, int clientVersion, RequestType type, InetSocketAddress socketAddress) {
+        this.bodyBuffer = buffer;
+        this.type = type;
         this.socketAddress = socketAddress;
-        this.type = RequestType.valueOf(cmdId);
         this.clientVersion = clientVersion;
     }
 
-    public Date getReceiveDate() {
-        return receiveDate;
+    public int getClientVersion() {
+        return clientVersion;
     }
 
-    public void setReceiveDate(Date receiveDate) {
-        this.receiveDate = receiveDate;
-    }
-
-    public long getSequence() {
-        return sequence;
+    public int getBodyLength() {
+        return bodyBuffer.getBodyLength() - HEAD_LEN;
     }
 
     public RequestType getType() {
         return type;
     }
 
-    public Integer getClientVersion() {
-        return clientVersion;
-    }
-
     public InetSocketAddress getSocketAddress() {
         return socketAddress;
     }
 
-    public static Request decodeFromByteArray(@NonNull byte[] bytes, InetSocketAddress socketAddress) throws RequestResolutionException {
-        if (bytes.length < HEAD_LEN)
-            throw new RequestResolutionException();
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-
-        // HEAD|sequence|clientVersion|cmdId|bodyLength  ->  int|long|int|int|int
-        if (buffer.getInt() != HEAD)
-            throw new RequestResolutionException();
-        long seq = buffer.getLong();
-
-        int clientVersion = buffer.getInt();
-
-        int cmdId = buffer.getInt();
-        if (cmdId < 0 || cmdId >= RequestType.values().length - 1)
-            throw new RequestResolutionException();
-
-        int bodyLength = buffer.getInt();
-
-        return new Request(buffer, seq, clientVersion, cmdId, bodyLength, socketAddress);
-    }
-
-    public BodyBuffer getBodyBuffer() {
+    public TransferPacket.BodyBuffer getBodyBuffer() {
+        bodyBuffer.position(HEAD_LEN);
         return bodyBuffer;
     }
 
-    public class BodyBuffer {
-
-        private int bodyLength;
-
-        private ByteBuffer byteBuffer;
-
-        public BodyBuffer(ByteBuffer byteBuffer, Integer bodyLength) {
-            this.byteBuffer = byteBuffer;
-            this.bodyLength = bodyLength;
+    public static Request decodeFromByteArray(TransferPacket.BodyBuffer buffer, InetSocketAddress socketAddress) throws RequestResolutionException {
+        if (buffer.getBodyLength() < HEAD_LEN) {
+            throw new RequestResolutionException();
+        }
+        // clientVersion|type  ->  int|int
+        int clientVersion = buffer.getInt();
+        if (clientVersion < 0) {
+            throw new RequestResolutionException();
+        }
+        int code = buffer.getInt();
+        if (code < 0 || code >= RequestType.values().length) {
+            throw new RequestResolutionException();
         }
 
-        public int getInt() {
-            if (Integer.BYTES > remainLength()) {
-                throw new BufferUnderflowException();
-            }
-            return byteBuffer.getInt();
-        }
-
-        public long getLong() {
-            if (Long.BYTES > remainLength()) {
-                throw new BufferUnderflowException();
-            }
-            return byteBuffer.getLong();
-        }
-
-        public void skip(int length) {
-            if (length > remainLength()) {
-                throw new IllegalArgumentException();
-            }
-            byteBuffer.position(byteBuffer.position() + length);
-        }
-
-        public void position(int index) {
-            index = Math.max(index, 0);
-            byteBuffer.position(HEAD_LEN + index);
-        }
-
-        public int position() {
-            return byteBuffer.position() - HEAD_LEN;
-        }
-
-        private int remainLength() {
-            return HEAD_LEN + bodyLength - byteBuffer.position();
-        }
-
-        public int getBodyLength() {
-            return bodyLength;
-        }
-
-        public String getString(int length) {
-            if (Character.BYTES * length > remainLength()) {
-                throw new BufferUnderflowException();
-            }
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0;i < length;i ++) {
-                builder.append(byteBuffer.getChar());
-            }
-            return builder.toString();
-        }
-    }
-
-    public enum RequestType {
-        ACK(0) {
-            @Override
-            public boolean isACK() {
-                return true;
-            }
-        },
-        PUT(1) {
-            @Override
-            public boolean isPUT() {
-                return true;
-            }
-        },
-        GET(2) {
-            @Override
-            public boolean isGET() {
-                return true;
-            }
-        },
-        UNKNOWN(3);
-
-        private final int cmdId;
-
-        RequestType(int cmdId) {
-            this.cmdId = cmdId;
-        }
-
-        public static RequestType valueOf(int cmdId) {
-            if (cmdId > -1 && cmdId < RequestType.values().length) {
-                return RequestType.values()[cmdId];
-            }
-            return UNKNOWN;
-        }
-
-        public int getCmdId() {
-            return cmdId;
-        }
-
-        public boolean isACK() {
-            return false;
-        }
-
-        public boolean isPUT() {
-            return false;
-        }
-
-        public boolean isGET() {
-            return false;
-        }
+        return new Request(buffer, clientVersion, RequestType.fromCode(code), socketAddress);
     }
 }

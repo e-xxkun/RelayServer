@@ -1,15 +1,13 @@
 package com.xxkun.relayserver.pojo;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
-import com.xxkun.relayserver.component.handler.HeartbeatMessageHandler;
 import com.xxkun.relayserver.component.handler.MessageHandler;
-import com.xxkun.relayserver.component.handler.PunchMessageHandler;
 import com.xxkun.relayserver.pojo.request.Message;
 import com.xxkun.relayserver.pojo.request.Request;
 import com.xxkun.relayserver.pojo.request.message.HeartbeatMessage;
 import com.xxkun.relayserver.pojo.request.message.PunchMessage;
 
-public enum  MessageType implements IMessageType {
+public enum MessageType implements IMessageType {
 
     PUNCH(0, "") {
         @Override

@@ -70,7 +70,7 @@ public class PacketPool {
 
     public TransferPacket createACKPacket(TransferPacket packet) {
         TransferPacket.BodyBuffer bodyBuffer = new TransferPacket.BodyBuffer(0);
-        TransferPacket ackPacket = new TransferPacket(bodyBuffer, 0, packet.getSocketAddress(), TransferPacket.Type.ACK);
+        TransferPacket ackPacket = new TransferPacket(bodyBuffer, packet.getSocketAddress(), TransferPacket.Type.ACK);
         ackPacket.setSequence(packet.getSequence());
         return ackPacket;
     }

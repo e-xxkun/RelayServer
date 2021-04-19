@@ -1,7 +1,9 @@
 package com.xxkun.relayserver.pojo.response;
 
 import com.xxkun.relayserver.component.exception.ResponseConvertException;
+import com.xxkun.relayserver.pojo.ResponseType;
 import com.xxkun.relayserver.pojo.user.UserInfo;
+import com.xxkun.udptransfer.TransferPacket;
 
 import java.net.InetSocketAddress;
 
@@ -27,11 +29,11 @@ public class HeartbeatResponse extends Response{
 
     @Override
     public ResponseType getType() {
-        return ResponseType.REPLY;
+        return ResponseType.HEARTBEAT;
     }
 
     @Override
-    protected void overwriteToByteArray(BodyBuffer bodyBuffer) throws ResponseConvertException {
-        bodyBuffer.writeString(userInfo.getSession().getToken());
+    protected void overwrite(TransferPacket.BodyBuffer bodyBuffer) {
+        bodyBuffer.putString(userInfo.getSession().getToken());
     }
 }

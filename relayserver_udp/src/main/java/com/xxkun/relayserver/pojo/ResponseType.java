@@ -1,26 +1,27 @@
 package com.xxkun.relayserver.pojo;
 
-public enum ReplyResponseType {
+public enum ResponseType {
     UNKNOWN(0),
     SUCCESS(1),
     LOGIN_EXPIRE(2),
 
     USER_NOT_EXIST(3),
     USER_OFFLINE(4),
+    USER_EXCEPTION(8),
 
-    UPDATE_TOKEN(5);
+    UPDATE_TOKEN(5),
+
+    PUNCH(6),
+    HEARTBEAT(7);
+
 
     final int code;
 
-    ReplyResponseType(int code) {
+    ResponseType(int code) {
         this.code = code;
     }
 
     public int getCode() {
         return code;
-    }
-
-    public int length() {
-        return Integer.BYTES;
     }
 }

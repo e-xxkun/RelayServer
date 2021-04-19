@@ -6,7 +6,7 @@ import com.xxkun.relayserver.pojo.request.Message;
 import com.xxkun.relayserver.pojo.request.message.PunchMessage;
 import com.xxkun.relayserver.pojo.response.PunchResponse;
 import com.xxkun.relayserver.pojo.response.UserExceptionResponse;
-import com.xxkun.relayserver.pojo.ReplyResponseType;
+import com.xxkun.relayserver.pojo.ResponseType;
 import com.xxkun.relayserver.send.ResponsePool;
 import com.xxkun.relayserver.send.ResponseSender;
 import com.xxkun.relayserver.service.UserInfoManageService;
@@ -54,13 +54,13 @@ public class PunchMessageHandler extends MessageHandler {
         if (notExistUsers.size() > 0) {
             UserExceptionResponse response = responsePool.createUserExceptionResponse(punchMessage.getRequest().getSocketAddress());
             response.setUserInfos(notExistUsers);
-            response.setType(ReplyResponseType.USER_NOT_EXIST);
+            response.setType(ResponseType.USER_NOT_EXIST);
             responseSender.send(response);
         }
         if (offloadUsers.size() > 0) {
             UserExceptionResponse response = responsePool.createUserExceptionResponse(punchMessage.getRequest().getSocketAddress());
             response.setUserInfos(offloadUsers);
-            response.setType(ReplyResponseType.USER_OFFLINE);
+            response.setType(ResponseType.USER_OFFLINE);
             responseSender.send(response);
         }
         if (punchUsers.size() > 0) {

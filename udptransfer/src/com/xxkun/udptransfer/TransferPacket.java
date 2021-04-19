@@ -207,7 +207,7 @@ public class TransferPacket implements Delayed {
         }
     }
 
-    public static class BodyBuffer  {
+    public final static class BodyBuffer  {
         
         private final ByteBuffer byteBuffer;
         private int bodyLength;

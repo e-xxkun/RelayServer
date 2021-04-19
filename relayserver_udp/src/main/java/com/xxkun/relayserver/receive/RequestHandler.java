@@ -1,6 +1,6 @@
 package com.xxkun.relayserver.receive;
 
-import com.xxkun.relayserver.send.ReplyHandler;
+import com.xxkun.relayserver.component.handler.ReplyHandler;
 import com.xxkun.relayserver.component.queue.IMessageQueue;
 import com.xxkun.relayserver.pojo.request.Message;
 import com.xxkun.relayserver.pojo.request.Request;
@@ -27,11 +27,6 @@ public class RequestHandler implements RequestListener.OnRequest {
 
     @Override
     public void onRequest(SocketAddress from, Request request) {
-        if (request.getType().isACK()) {
-            replyHandler.consume(request);
-            return;
-        }
-
         Message message = Message.decodeFromRequest(request);
         if (message == null) {
             replyHandler.replyUnknown(request);
@@ -48,6 +43,5 @@ public class RequestHandler implements RequestListener.OnRequest {
         } else if (request.getType().isPUT()){
             putMsgQueueSender.sendMessage(message);
         }
-        replyHandler.replySuccess(request);
     }
 }

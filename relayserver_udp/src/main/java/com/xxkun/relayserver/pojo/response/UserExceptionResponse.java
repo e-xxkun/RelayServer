@@ -1,22 +1,22 @@
 package com.xxkun.relayserver.pojo.response;
 
 import com.xxkun.relayserver.pojo.user.UserInfo;
-import com.xxkun.relayserver.pojo.ReplyResponseType;
+import com.xxkun.relayserver.pojo.ResponseType;
+import com.xxkun.udptransfer.TransferPacket;
 
 import java.net.InetSocketAddress;
 import java.util.List;
 
 public class UserExceptionResponse extends Response{
 
-    private ReplyResponseType type = ReplyResponseType.UNKNOWN;
-
+    private ResponseType type = ResponseType.UNKNOWN;
     private List<UserInfo> userInfos;
 
     public UserExceptionResponse(InetSocketAddress socketAddress) {
         super(socketAddress);
     }
 
-    public void setType(ReplyResponseType type) {
+    public void setType(ResponseType type) {
         this.type = type;
     }
 
@@ -30,21 +30,20 @@ public class UserExceptionResponse extends Response{
 
     @Override
     public int getBodyLength() {
-        return type.length();
+        return userInfos.size() * Long.BYTES + Integer.BYTES * 2;
     }
 
     @Override
     public ResponseType getType() {
-        return ResponseType.REPLY;
+        return ResponseType.USER_EXCEPTION;
     }
 
     @Override
-    protected void overwriteToByteArray(BodyBuffer bodyBuffer) {
-        bodyBuffer.position(0);
-        bodyBuffer.writeInt(type.getCode());
-        bodyBuffer.writeInt(userInfos.size());
+    protected void overwrite(TransferPacket.BodyBuffer bodyBuffer) {
+        bodyBuffer.putInt(type.getCode());
+        bodyBuffer.putInt(userInfos.size());
         for (UserInfo info : userInfos) {
-            bodyBuffer.writeLong(info.getUserId());
+            bodyBuffer.putLong(info.getUserId());
         }
     }
 }
