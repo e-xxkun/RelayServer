@@ -1,6 +1,7 @@
 package com.xxkun.relayserver.pojo.response;
 
 import com.xxkun.relayserver.component.exception.ResponseConvertException;
+import com.xxkun.udptransfer.TransferPacket;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -27,7 +28,7 @@ public abstract class Response implements Delayed {
 
     private ResponseType type;
 
-    private final BodyBuffer bodyBuffer;
+    private final TransferPacket.BodyBuffer bodyBuffer;
 
     private String id;
 
@@ -140,50 +141,8 @@ public abstract class Response implements Delayed {
         return id.hashCode();
     }
 
-    public class BodyBuffer {
-
-        private final ByteBuffer byteBuffer;
-
-        public BodyBuffer() {
-            byteBuffer = ByteBuffer.allocate(UDP_MSG_MAX_LEN);
-        }
-
-        public void skip(int length) {
-            position(position() + length);
-        }
-
-        public void writeInt(int value) {
-            if (position() < 0) {
-                position(0);
-            }
-            byteBuffer.putInt(value);
-        }
-
-        public void position(int index) {
-            index = Math.max(index, 0);
-            byteBuffer.position(HEAD_LEN + index);
-        }
-
-        public int position() {
-            return byteBuffer.position() - HEAD_LEN;
-        }
-
-        public void writeString(String value) {
-            for (int i = 0;i < value.length();i ++) {
-                byteBuffer.putChar(value.charAt(i));
-            }
-        }
-
-        public int limit() {
-            return UDP_MSG_MAX_LEN - HEAD_LEN;
-        }
-
-        public void writeLong(long value) {
-            if (position() < 0) {
-                position(0);
-            }
-            byteBuffer.putLong(value);
-        }
+    public TransferPacket.BodyBuffer getBodyBuffer() {
+        return null;
     }
 
     public enum ResponseType {

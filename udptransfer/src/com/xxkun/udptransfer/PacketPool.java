@@ -69,8 +69,8 @@ public class PacketPool {
     }
 
     public TransferPacket createACKPacket(TransferPacket packet) {
-        byte[] data = new byte[TransferPacket.HEAD_LEN];
-        TransferPacket ackPacket = new TransferPacket(data, packet.getSocketAddress(), true);
+        TransferPacket.BodyBuffer bodyBuffer = new TransferPacket.BodyBuffer(0);
+        TransferPacket ackPacket = new TransferPacket(bodyBuffer, 0, packet.getSocketAddress(), TransferPacket.Type.ACK);
         ackPacket.setSequence(packet.getSequence());
         return ackPacket;
     }

@@ -2,6 +2,8 @@ package com.xxkun.relayserver.send;
 
 import com.xxkun.relayserver.component.exception.ResponseConvertException;
 import com.xxkun.relayserver.pojo.response.Response;
+import com.xxkun.udptransfer.TransferPacket;
+import com.xxkun.udptransfer.TransferServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +16,7 @@ import java.util.Date;
 public class ResponseSender implements ResponsePool.OnResponseTimeout {
 
     @Autowired
-    private DatagramSocket sender;
+    private TransferServer sender;
     @Autowired
     private ResponsePool responsePool;
 
@@ -24,11 +26,9 @@ public class ResponseSender implements ResponsePool.OnResponseTimeout {
                 response.setSendDate(new Date());
                 responsePool.add(response);
             }
-            DatagramPacket packet = new DatagramPacket(response.convertToByteArray(), response.getBodyLength(), response.getSocketAddress());
+            TransferPacket packet = new TransferPacket(response.getBodyBuffer(), response.getSocketAddress());
             sender.send(packet);
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ResponseConvertException e) {
             e.printStackTrace();
         }
     }

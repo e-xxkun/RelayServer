@@ -1,6 +1,7 @@
 package com.xxkun.udptransfer;
 
 import java.net.InetSocketAddress;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +16,6 @@ public class TransferPacket implements Delayed {
     private Long sequence;
     private int resendTime = 0;
     private InetSocketAddress socketAddress;
-    private int bodyLength = 0;
     private final Type type;
 
     private String id;
@@ -23,41 +23,25 @@ public class TransferPacket implements Delayed {
     private Long receiveTime;
     private Long sendTime;
 
-    private final ByteBuffer buffer;
-
-    public TransferPacket(InetSocketAddress socketAddress) {
-        this(new byte[TransferServer.MAX_TRANSFER_LEN], socketAddress, false);
+    private final BodyBuffer buffer;
+    
+    public TransferPacket(BodyBuffer buffer, InetSocketAddress socketAddress) {
+        this(buffer, socketAddress, Type.GET);
     }
 
-    public TransferPacket(byte[] data, InetSocketAddress socketAddress) {
-        this(data, socketAddress, false);
-    }
-
-    public TransferPacket(byte[] data, InetSocketAddress socketAddress, boolean isACK) {
-        this(data, socketAddress, isACK ? Type.ACK : Type.GET);
-    }
-
-    public TransferPacket(byte[] data, InetSocketAddress socketAddress, Type type) {
-        this(ByteBuffer.wrap(data), socketAddress, type);
-    }
-
-    public TransferPacket(ByteBuffer buffer, InetSocketAddress socketAddress, Type type) {
+    public TransferPacket(BodyBuffer buffer, InetSocketAddress socketAddress, Type type) {
         this.socketAddress = socketAddress;
         this.buffer = buffer;
         this.type = type;
         refreshId();
     }
 
-    public void setBodyLength(int bodyLength) {
-        this.bodyLength = bodyLength;
-    }
-
     public int getBodyLength() {
-        return bodyLength;
+        return buffer.getBodyLength();
     }
 
     public int length() {
-        return HEAD_LEN + bodyLength;
+        return HEAD_LEN + buffer.getBodyLength();
     }
 
     public boolean isACK() {
@@ -98,8 +82,8 @@ public class TransferPacket implements Delayed {
         return type;
     }
 
-    public ByteBuffer getBuffer() {
-        buffer.position(HEAD_LEN);
+    public BodyBuffer getBuffer() {
+        buffer.position(0);
         return buffer;
     }
 
@@ -135,15 +119,20 @@ public class TransferPacket implements Delayed {
     }
 
     public byte[] convertToByteArray() {
-        buffer.position(0);
-        buffer.putInt(HEAD);
-        buffer.putLong(sequence);
-        buffer.put(type.getCode());
-        buffer.putInt(getBodyLength());
+        int curPosition = buffer.position();
+        buffer.byteBuffer.position(0);
+        buffer.byteBuffer.putInt(HEAD);
+        buffer.byteBuffer.putLong(sequence);
+        buffer.byteBuffer.put(type.getCode());
+        buffer.byteBuffer.putInt(getBodyLength());
+        buffer.position(curPosition);
         return buffer.array();
     }
 
     public static TransferPacket decodeFromByteArray(byte[] data, InetSocketAddress socketAddress) {
+        if (data.length < HEAD_LEN) {
+            return null;
+        }
         ByteBuffer buffer = ByteBuffer.wrap(data);
         if (buffer.getInt() != HEAD) {
           return null;
@@ -158,9 +147,8 @@ public class TransferPacket implements Delayed {
         if (bodyLength < 0) {
             return null;
         }
-        TransferPacket packet = new TransferPacket(buffer, socketAddress, type);
+        TransferPacket packet = new TransferPacket(new BodyBuffer(buffer, bodyLength), socketAddress, type);
         packet.setSequence(sequence);
-        packet.setBodyLength(bodyLength);
         return packet;
     }
 
@@ -188,7 +176,7 @@ public class TransferPacket implements Delayed {
         return id.hashCode();
     }
 
-    private enum Type {
+    public enum Type {
         ACK(0) {
             @Override
             public boolean isACK() {
@@ -216,6 +204,103 @@ public class TransferPacket implements Delayed {
                 return Type.values()[code];
             }
             return GET;
+        }
+    }
+
+    public static class BodyBuffer  {
+        
+        private final ByteBuffer byteBuffer;
+        private int bodyLength;
+        
+        public BodyBuffer() {
+            this(TransferServer.MAX_TRANSFER_LEN - HEAD_LEN);
+        }
+        
+        public BodyBuffer(int bodyLength) {
+            this(new byte[HEAD_LEN + bodyLength], bodyLength);
+        }
+        
+        public BodyBuffer(byte[] data, int bodyLength) {
+            this(ByteBuffer.wrap(data), bodyLength);
+        }
+        
+        private BodyBuffer(ByteBuffer buffer, int bodyLength) {
+            this.bodyLength = bodyLength;
+            byteBuffer = buffer;
+            byteBuffer.position(HEAD_LEN);
+        }
+        
+        public void put(byte value) {
+            byteBuffer.put(value);
+        }
+
+        public void putInt(int value) {
+            byteBuffer.putInt(value);
+        }
+
+        public void putLong(long value) {
+            byteBuffer.putLong(value);
+        }
+
+        public void putChar(char value) {
+            byteBuffer.putChar(value);
+        }
+
+        public void putString(String value) {
+            for (int i = 0;i < value.length();i ++) {
+                byteBuffer.putChar(value.charAt(i));
+            }
+        }
+        
+        public byte get() {
+            return byteBuffer.get();
+        }
+
+        public int getInt() {
+            return byteBuffer.getInt();
+        }
+
+        public long getLong() {
+            return byteBuffer.getLong();
+        }
+
+        public char getChar() {
+            return byteBuffer.getChar();
+        }
+
+        public String getString(int length) {
+            StringBuilder builder = new StringBuilder(length);
+            for (int i = 0;i < length;i ++) {
+                builder.append(byteBuffer.getChar());
+            }
+            return builder.toString();
+        }
+
+        public void position(int index) {
+            if (index < 0) {
+                throw new BufferOverflowException();
+            }
+            byteBuffer.position(HEAD_LEN + index);
+        }
+
+        public int position() {
+            return byteBuffer.position() - HEAD_LEN;
+        }
+
+        public int limit() {
+            return byteBuffer.limit() - HEAD_LEN;
+        }
+
+        public byte[] array() {
+            return byteBuffer.array();
+        }
+
+        protected void setBodyLength(int bodyLength) {
+            this.bodyLength = bodyLength;
+        }
+
+        public int getBodyLength() {
+            return  bodyLength;
         }
     }
 }
