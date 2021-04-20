@@ -1,9 +1,10 @@
 package com.xxkun.relayserver.pojo.request;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
+import com.xxkun.relayserver.pojo.IInnerMessageType;
 import com.xxkun.relayserver.pojo.user.UserSession;
 import com.xxkun.relayserver.pojo.IMessageType;
-import com.xxkun.relayserver.pojo.MessageType;
+import com.xxkun.relayserver.pojo.MessageFactory;
 import com.xxkun.udptransfer.TransferPacket;
 
 import java.nio.BufferUnderflowException;
@@ -19,6 +20,11 @@ public abstract class Message {
         decode(request);
     }
 
+    public Message(Message message) {
+        this.request = message.request;
+        this.userSession = message.userSession;
+    }
+
     public UserSession getUserSession() {
         return userSession;
     }
@@ -31,8 +37,15 @@ public abstract class Message {
         return HEAD_LEN + Request.getHeadLength();
     }
 
-    public abstract IMessageType getType();
-    protected abstract void decode(Request request) throws MessageResolutionException;
+    public int getBodyLength() {
+        return request.getBodyLength() - HEAD_LEN;
+    }
+
+    public abstract IInnerMessageType getType();
+
+    protected void decode(Request request) throws MessageResolutionException {
+
+    }
 
     public static Message decodeFromRequest(Request request) {
         TransferPacket.BodyBuffer buffer = request.getBodyBuffer();
@@ -44,7 +57,7 @@ public abstract class Message {
         } catch (BufferUnderflowException e) {
             return null;
         }
-        IMessageType messageType = MessageType.fromTypeCode(request.getType(), type);
+        IMessageType messageType = MessageFactory.fromTypeCode(request.getType(), type);
         if (messageType == null)
             return null;
         Message message = null;

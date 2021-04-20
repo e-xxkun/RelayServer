@@ -17,7 +17,7 @@ public class RefreshSessionHandler extends MessageHandler {
     @Autowired
     private ResponseSender responseSender;
     @Override
-    public IMessageType getMessageType() {
+    public IMessageType getInnerMessageType() {
         return null;
     }
 

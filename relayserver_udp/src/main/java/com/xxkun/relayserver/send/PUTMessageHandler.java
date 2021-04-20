@@ -6,11 +6,11 @@ import com.xxkun.relayserver.pojo.request.Message;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MessageSendHandler implements IMessageQueue.OnMessage{
+public class PUTMessageHandler implements IMessageQueue.OnMessage{
 
     @Override
     public void onMessage(Message msg) {
-        MessageHandler messageHandler = msg.getType().getMessageHandler();
+        MessageHandler messageHandler = MessageHandler.getPUTMessageHandler(msg.getType());
         if (messageHandler != null) {
             messageHandler.consume(msg);
         }

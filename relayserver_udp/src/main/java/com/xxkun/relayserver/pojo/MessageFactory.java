@@ -1,21 +1,22 @@
 package com.xxkun.relayserver.pojo;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
-import com.xxkun.relayserver.component.handler.MessageHandler;
 import com.xxkun.relayserver.pojo.request.Message;
 import com.xxkun.relayserver.pojo.request.Request;
 import com.xxkun.relayserver.pojo.request.message.HeartbeatMessage;
 import com.xxkun.relayserver.pojo.request.message.PunchMessage;
+import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MessageType {
+@Component
+public class MessageFactory {
 
     private static EnumMap<RequestType, Map<Integer, IMessageType>> typeMap;
 
-    {
+    static {
         typeMap = new EnumMap<>(RequestType.class);
         for (RequestType type : RequestType.values()) {
             typeMap.put(type, new HashMap<>());
@@ -26,10 +27,10 @@ public class MessageType {
         return typeMap.get(type).get(code);
     }
 
-    private static void init(IMessageType[] types, RequestType requestType) {
-        Map<Integer, IMessageType> map = typeMap.get(requestType);
-        for (IMessageType type : types) {
-            map.put(type.getCode(), type);
+    private static void init(IMessageType[] types, RequestType type) {
+        Map<Integer, IMessageType> map = typeMap.get(type);
+        for (IMessageType messageType : types) {
+            map.put(messageType.getCode(), messageType);
         }
     }
 
@@ -51,12 +52,12 @@ public class MessageType {
             this.code = code;
         }
         @Override
-        public int getCode() {
-            return code;
+        public boolean isPUT() {
+            return true;
         }
         @Override
-        public MessageHandler getMessageHandler() {
-            return MessageHandler.getInstance(this);
+        public int getCode() {
+            return code;
         }
     }
 
@@ -97,12 +98,12 @@ public class MessageType {
         }
 
         @Override
-        public int getCode() {
-            return code;
+        public boolean isPUT() {
+            return false;
         }
         @Override
-        public MessageHandler getMessageHandler() {
-            return MessageHandler.getInstance(this);
+        public int getCode() {
+            return code;
         }
     }
 }

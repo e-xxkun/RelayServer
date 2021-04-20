@@ -3,6 +3,7 @@ package com.xxkun.relayserver.component.queue;
 import com.xxkun.relayserver.component.BaseThread;
 import com.xxkun.relayserver.pojo.request.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -11,6 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @Component
 public class GetMessageQueue implements IMessageQueue {
+    @Qualifier("GETMessageHandler")
     @Autowired
     private OnMessage onMessage;
     @Resource(name = "responseThreadPool")

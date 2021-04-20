@@ -32,7 +32,7 @@ public class RequestHandler implements RequestListener.OnRequest {
             replyHandler.replyUnknown(request);
             return;
         }
-        UserSession userSession = userInfoManageService.getUserSessionFromToken(message.getToken());
+        UserSession userSession = userInfoManageService.getUserSessionFromToken(request.getToken());
         if (userSession == null) {
             replyHandler.replyLoginExpire(request);
             return;
