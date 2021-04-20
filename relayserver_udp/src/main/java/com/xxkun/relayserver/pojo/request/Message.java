@@ -4,17 +4,16 @@ import com.xxkun.relayserver.component.exception.MessageResolutionException;
 import com.xxkun.relayserver.pojo.user.UserSession;
 import com.xxkun.relayserver.pojo.IMessageType;
 import com.xxkun.relayserver.pojo.MessageType;
-import org.springframework.lang.NonNull;
+import com.xxkun.udptransfer.TransferPacket;
 
 public abstract class Message {
 
-    public static final int MESSAGE_TOKEN_LEN = 16;
-
+    protected static final int MESSAGE_TOKEN_LEN = 16;
+    private static final int HEAD_LEN = Integer.BYTES;
     private final Request request;
-
     private UserSession userSession;
 
-    public Message(@NonNull Request request) throws MessageResolutionException {
+    public Message(Request request) throws MessageResolutionException {
         this.request = request;
         decode(request);
     }
@@ -31,14 +30,18 @@ public abstract class Message {
         this.userSession = userSession;
     }
 
-    public abstract MessageType getType();
+    public static int getHeadLength() {
+        return HEAD_LEN + Request.getHeadLength();
+    }
 
+    public abstract MessageType getType();
     protected abstract void decode(Request request) throws MessageResolutionException;
 
-    public static Message decodeFromRequest(@NonNull Request request) {
-        Request.BodyBuffer buffer = request.getBodyBuffer();
-        buffer.position(0);
+    public static Message decodeFromRequest(Request request) {
+        TransferPacket.BodyBuffer buffer = request.getBodyBuffer();
+        buffer.position(Request.getHeadLength());
         int type = buffer.getInt();
+
         IMessageType messageType = IMessageType.fromTypeCode(type);
         if (messageType == null)
             return null;
@@ -67,5 +70,4 @@ public abstract class Message {
     public int hashCode() {
         return request.hashCode();
     }
-
 }

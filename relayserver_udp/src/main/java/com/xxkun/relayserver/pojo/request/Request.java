@@ -47,6 +47,10 @@ public final class Request {
         return bodyBuffer;
     }
 
+    public static int getHeadLength() {
+        return HEAD_LEN;
+    }
+
     public static Request decodeFromByteArray(TransferPacket.BodyBuffer buffer, InetSocketAddress socketAddress) throws RequestResolutionException {
         if (buffer.getBodyLength() < HEAD_LEN) {
             throw new RequestResolutionException();

@@ -9,14 +9,14 @@ import java.util.List;
 
 public class UserExceptionResponse extends Response{
 
-    private ResponseType type = ResponseType.UNKNOWN;
+    private ResponseType.UserExceptionType type = ResponseType.UserExceptionType.USER_OFFLINE;
     private List<UserInfo> userInfos;
 
     public UserExceptionResponse(InetSocketAddress socketAddress) {
         super(socketAddress);
     }
 
-    public void setType(ResponseType type) {
+    public void setType(ResponseType.UserExceptionType type) {
         this.type = type;
     }
 
