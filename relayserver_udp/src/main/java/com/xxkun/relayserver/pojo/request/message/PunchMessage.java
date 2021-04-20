@@ -1,16 +1,16 @@
 package com.xxkun.relayserver.pojo.request.message;
 
 import com.xxkun.relayserver.component.exception.MessageResolutionException;
+import com.xxkun.relayserver.pojo.IMessageType;
 import com.xxkun.relayserver.pojo.user.UserInfo;
 import com.xxkun.relayserver.pojo.request.Message;
 import com.xxkun.relayserver.pojo.request.Request;
 import com.xxkun.relayserver.pojo.MessageType;
+import com.xxkun.udptransfer.TransferPacket;
 
 import java.nio.BufferUnderflowException;
 
 public class PunchMessage extends Message {
-
-    private String token;
 
     private UserInfo[] userInfos;
 
@@ -23,22 +23,15 @@ public class PunchMessage extends Message {
     }
 
     @Override
-    public String getToken() {
-        return token;
-    }
-
-    @Override
-    public MessageType getType() {
-        return MessageType.PUNCH;
+    public IMessageType getType() {
+        return MessageType.GET.PUNCH;
     }
 
     @Override
     protected void decode(Request udpField) throws MessageResolutionException {
-        Request.BodyBuffer buffer = udpField.getBodyBuffer();
+        TransferPacket.BodyBuffer buffer = udpField.getBodyBuffer();
         try {
-            // skip the message type byte
-            buffer.skip(Integer.BYTES);
-            token = buffer.getString(MESSAGE_TOKEN_LEN);
+            buffer.position(getHeadLength());
             int count = buffer.getInt();
             userInfos = new UserInfo[count];
 

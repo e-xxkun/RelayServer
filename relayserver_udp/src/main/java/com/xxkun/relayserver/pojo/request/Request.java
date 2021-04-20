@@ -13,17 +13,24 @@ import java.util.Date;
 
 public final class Request {
 
-    private final static int HEAD_LEN = 2 * Integer.BYTES;
+    private static final int TOKEN_LEN = 16;
+    private final static int HEAD_LEN = 2 * Integer.BYTES + TOKEN_LEN;
     private final InetSocketAddress socketAddress;
     private final int clientVersion;
     private final RequestType type;
     private final TransferPacket.BodyBuffer bodyBuffer;
+    private final String token;
 
-    private Request(TransferPacket.BodyBuffer buffer, int clientVersion, RequestType type, InetSocketAddress socketAddress) {
+    private Request(TransferPacket.BodyBuffer buffer, int clientVersion, RequestType type, String token, InetSocketAddress socketAddress) {
         this.bodyBuffer = buffer;
         this.type = type;
         this.socketAddress = socketAddress;
         this.clientVersion = clientVersion;
+        this.token = token;
+    }
+
+    public String getToken() {
+        return token;
     }
 
     public int getClientVersion() {
@@ -55,16 +62,21 @@ public final class Request {
         if (buffer.getBodyLength() < HEAD_LEN) {
             throw new RequestResolutionException();
         }
-        // clientVersion|type  ->  int|int
-        int clientVersion = buffer.getInt();
-        if (clientVersion < 0) {
+        // clientVersion|type|token  ->  int|int|char[]
+        int clientVersion;
+        int code;
+        String token;
+        try {
+            clientVersion = buffer.getInt();
+            token = buffer.getString(TOKEN_LEN);
+            code = buffer.getInt();
+        } catch (BufferUnderflowException e) {
             throw new RequestResolutionException();
         }
-        int code = buffer.getInt();
-        if (code < 0 || code >= RequestType.values().length) {
+        if (clientVersion < 0 || code < 0 || code >= RequestType.values().length) {
             throw new RequestResolutionException();
         }
 
-        return new Request(buffer, clientVersion, RequestType.fromCode(code), socketAddress);
+        return new Request(buffer, clientVersion, RequestType.fromCode(code), token, socketAddress);
     }
 }

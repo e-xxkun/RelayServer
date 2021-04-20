@@ -6,9 +6,10 @@ import com.xxkun.relayserver.pojo.IMessageType;
 import com.xxkun.relayserver.pojo.MessageType;
 import com.xxkun.udptransfer.TransferPacket;
 
+import java.nio.BufferUnderflowException;
+
 public abstract class Message {
 
-    protected static final int MESSAGE_TOKEN_LEN = 16;
     private static final int HEAD_LEN = Integer.BYTES;
     private final Request request;
     private UserSession userSession;
@@ -16,10 +17,6 @@ public abstract class Message {
     public Message(Request request) throws MessageResolutionException {
         this.request = request;
         decode(request);
-    }
-
-    public String getToken() {
-        return null;
     }
 
     public UserSession getUserSession() {
@@ -34,20 +31,26 @@ public abstract class Message {
         return HEAD_LEN + Request.getHeadLength();
     }
 
-    public abstract MessageType getType();
+    public abstract IMessageType getType();
     protected abstract void decode(Request request) throws MessageResolutionException;
 
     public static Message decodeFromRequest(Request request) {
         TransferPacket.BodyBuffer buffer = request.getBodyBuffer();
         buffer.position(Request.getHeadLength());
-        int type = buffer.getInt();
 
-        IMessageType messageType = IMessageType.fromTypeCode(type);
+        int type;
+        try {
+            type = buffer.getInt();
+        } catch (BufferUnderflowException e) {
+            return null;
+        }
+        IMessageType messageType = MessageType.fromTypeCode(request.getType(), type);
         if (messageType == null)
             return null;
         Message message = null;
         try {
             message = messageType.createMessage(request);
+
         } catch (MessageResolutionException e) {
             e.printStackTrace();
         }

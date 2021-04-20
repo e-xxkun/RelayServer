@@ -7,93 +7,99 @@ import com.xxkun.relayserver.pojo.request.Request;
 import com.xxkun.relayserver.pojo.request.message.HeartbeatMessage;
 import com.xxkun.relayserver.pojo.request.message.PunchMessage;
 
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+
 public class MessageType {
 
-    public enum PUT{
-        UNKNOWN(3, "");
+    private static EnumMap<RequestType, Map<Integer, IMessageType>> typeMap;
 
+    {
+        typeMap = new EnumMap<>(RequestType.class);
+        for (RequestType type : RequestType.values()) {
+            typeMap.put(type, new HashMap<>());
+        }
+    }
+
+    public static IMessageType fromTypeCode(RequestType type, int code) {
+        return typeMap.get(type).get(code);
+    }
+
+    private static void init(IMessageType[] types, RequestType requestType) {
+        Map<Integer, IMessageType> map = typeMap.get(requestType);
+        for (IMessageType type : types) {
+            map.put(type.getCode(), type);
+        }
+    }
+
+    public enum PUT implements IMessageType {
+        UNKNOWN(3) {
+            @Override
+            public Message createMessage(Request request) {
+                return null;
+            }
+        };
 
         private final int code;
-        private final String info;
-
-        PUT(int code, String info) {
-            this.code = code;
-            this.info = info;
-        }
 
         static {
-            for (MessageType type : MessageType.values()) {
-                typeMap.put(type.code, type);
-            }
+            init(values(), RequestType.PUT);
         }
 
-        @Override
-        public String getInfo() {
-            return info;
+        PUT(int code) {
+            this.code = code;
         }
-
         @Override
         public int getCode() {
             return code;
         }
-
-        @Override
-        public Message createMessage(Request request) throws MessageResolutionException {
-            return null;
-        }
-
         @Override
         public MessageHandler getMessageHandler() {
             return MessageHandler.getInstance(this);
         }
     }
 
-    public enum GET {
-        PUNCH(0, "") {
+    public enum GET implements IMessageType {
+        PUNCH(0) {
             @Override
             public Message createMessage(Request request) throws MessageResolutionException {
                 return new PunchMessage(request);
             }
         },
-        HEARTBEAT(1, ""){
+        HEARTBEAT(1){
             @Override
             public Message createMessage(Request request) throws MessageResolutionException {
                 return new HeartbeatMessage(request);
             }
         },
-        REPLY(2, ""),
-        UNKNOWN(3, "");
-
+        REPLY(2) {
+            @Override
+            public Message createMessage(Request request) throws MessageResolutionException {
+                return null;
+            }
+        },
+        UNKNOWN(3) {
+            @Override
+            public Message createMessage(Request request) throws MessageResolutionException {
+                return null;
+            }
+        };
 
         private final int code;
-        private final String info;
 
-        GET(int code, String info) {
+        GET(int code) {
             this.code = code;
-            this.info = info;
         }
 
-//        static {
-//            for (MessageType type : MessageType.values()) {
-//                typeMap.put(type.code, type);
-//            }
-//        }
-
-        @Override
-        public String getInfo() {
-            return info;
+        static {
+            init(values(), RequestType.GET);
         }
 
         @Override
         public int getCode() {
             return code;
         }
-
-        @Override
-        public Message createMessage(Request request) throws MessageResolutionException {
-            return null;
-        }
-
         @Override
         public MessageHandler getMessageHandler() {
             return MessageHandler.getInstance(this);

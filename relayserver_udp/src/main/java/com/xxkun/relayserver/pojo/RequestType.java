@@ -1,7 +1,5 @@
 package com.xxkun.relayserver.pojo;
 
-import com.xxkun.udptransfer.TransferPacket;
-
 public enum RequestType {
     GET(0) {
         @Override
