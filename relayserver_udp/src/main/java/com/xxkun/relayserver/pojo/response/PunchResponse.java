@@ -57,7 +57,7 @@ public class PunchResponse extends Response {
     @Override
     protected void overwrite(TransferPacket.BodyBuffer bodyBuffer) {
         int curPosition = bodyBuffer.position();
-        bodyLength = 0;
+        bodyLength = Integer.BYTES;
         int i = index;
         for (;i < userInfos.size() && bodyLength < bodyBuffer.limit();i ++) {
             UserInfo info = userInfos.get(i);

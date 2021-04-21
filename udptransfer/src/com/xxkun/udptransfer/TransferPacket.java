@@ -247,11 +247,18 @@ public class TransferPacket implements Delayed {
         }
 
         public void putString(String value) {
-            for (int i = 0;i < value.length();i ++) {
+            putString(value, value.length());
+        }
+
+        public void putString(String value, int length) {
+            if (length > value.length()) {
+                throw new BufferOverflowException();
+            }
+            for (int i = 0;i < length;i ++) {
                 byteBuffer.putChar(value.charAt(i));
             }
         }
-        
+
         public byte get() {
             return byteBuffer.get();
         }

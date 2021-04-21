@@ -12,5 +12,4 @@ public class UdpserverApplication {
         SpringApplication.run(UdpserverApplication.class, args);
 
     }
-
 }
