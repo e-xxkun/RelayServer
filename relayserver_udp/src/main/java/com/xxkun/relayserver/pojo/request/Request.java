@@ -14,7 +14,7 @@ import java.util.Date;
 public final class Request {
 
     private static final int TOKEN_LEN = 16;
-    private final static int HEAD_LEN = 2 * Integer.BYTES + TOKEN_LEN;
+    private final static int HEAD_LEN = 2 * Integer.BYTES + TOKEN_LEN * Character.BYTES;
     private final InetSocketAddress socketAddress;
     private final int clientVersion;
     private final RequestType type;
@@ -62,7 +62,7 @@ public final class Request {
         if (buffer.getBodyLength() < HEAD_LEN) {
             throw new RequestResolutionException();
         }
-        // clientVersion|type|token  ->  int|int|char[]
+        // client_version|type|token  ->  int|int|char[16]
         int clientVersion;
         int code;
         String token;
