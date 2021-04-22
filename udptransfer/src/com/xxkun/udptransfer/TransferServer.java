@@ -5,7 +5,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.util.Date;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TransferServer implements PacketPool.OnPacketConfirmTimeout {
 
@@ -13,8 +14,12 @@ public class TransferServer implements PacketPool.OnPacketConfirmTimeout {
 
     private DatagramSocket socket;
     private PacketPool pool;
+    private Set<InetSocketAddress> whiteList;
+
+    private boolean interceptAll = true;
 
     private OnPacketReachMaxResendTime onPacketReachMaxResendTime;
+    private OnPacketReceive onPacketReceive;
 
     public TransferServer(int port) throws SocketException {
         socket = new DatagramSocket(port);
@@ -27,8 +32,13 @@ public class TransferServer implements PacketPool.OnPacketConfirmTimeout {
     }
 
     private void init() {
+        whiteList = ConcurrentHashMap.newKeySet();
         pool = new PacketPool();
         pool.setOnPacketConfirmTimeout(this);
+    }
+
+    public void send(DatagramPacket packet) throws IOException {
+        socket.send(packet);
     }
 
     public void send(TransferPacket packet) throws IOException {
@@ -48,16 +58,21 @@ public class TransferServer implements PacketPool.OnPacketConfirmTimeout {
         DatagramPacket packet = pool.createPacket();
         while (true) {
             socket.receive(packet);
-            TransferPacket transferPacket = TransferPacket.decodeFromByteArray(packet.getData(), (InetSocketAddress) packet.getSocketAddress());
-            if (transferPacket == null) {
-                continue;
-            }
-            transferPacket.setReceiveTime(System.currentTimeMillis());
-            if (transferPacket.isACK()) {
-                pool.confirm(transferPacket);
-            } else {
-                sendACK(transferPacket);
-                return transferPacket;
+            InetSocketAddress socketAddress = (InetSocketAddress) packet.getSocketAddress();
+            if (interceptAll || whiteList.contains(socketAddress)) {
+                TransferPacket transferPacket = TransferPacket.decodeFromByteArray(packet.getData(), socketAddress);
+                if (transferPacket == null) {
+                    continue;
+                }
+                transferPacket.setReceiveTime(System.currentTimeMillis());
+                if (transferPacket.isACK()) {
+                    pool.confirm(transferPacket);
+                } else {
+                    sendACK(transferPacket);
+                    return transferPacket;
+                }
+            } else if (onPacketReceive != null){
+                onPacketReceive.onPacketReceive(packet);
             }
         }
     }
@@ -65,6 +80,22 @@ public class TransferServer implements PacketPool.OnPacketConfirmTimeout {
     private void sendACK(TransferPacket packet) throws IOException {
         TransferPacket ackPacket = pool.createACKPacket(packet);
         send(ackPacket, false);
+    }
+
+    public void addReceiveWhiteList(Set<InetSocketAddress> whiteList) {
+        this.whiteList.addAll(whiteList);
+    }
+
+    public Set<InetSocketAddress> getReceiveWhiteList() {
+        return whiteList;
+    }
+
+    public boolean isInterceptAll() {
+        return interceptAll;
+    }
+
+    public void setInterceptAll(boolean interceptAll) {
+        this.interceptAll = interceptAll;
     }
 
     @Override
@@ -87,7 +118,15 @@ public class TransferServer implements PacketPool.OnPacketConfirmTimeout {
         this.onPacketReachMaxResendTime = onPacketReachMaxResendTime;
     }
 
+    public void setOnPacketReceive(OnPacketReceive onPacketReceive) {
+        this.onPacketReceive = onPacketReceive;
+    }
+
     public interface OnPacketReachMaxResendTime {
         void onPacketReachMaxResendTime(TransferPacket packet);
+    }
+
+    public interface OnPacketReceive {
+        void onPacketReceive(DatagramPacket packet);
     }
 }
