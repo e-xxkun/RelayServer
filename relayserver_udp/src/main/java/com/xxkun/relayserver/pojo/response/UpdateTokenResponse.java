@@ -7,10 +7,10 @@ import com.xxkun.udptransfer.TransferPacket;
 
 import java.net.InetSocketAddress;
 
-public class HeartbeatResponse extends Response{
+public class UpdateTokenResponse extends Response{
     private UserInfo userInfo;
 
-    public HeartbeatResponse(InetSocketAddress socketAddress) {
+    public UpdateTokenResponse(InetSocketAddress socketAddress) {
         super(socketAddress);
     }
 
@@ -29,7 +29,7 @@ public class HeartbeatResponse extends Response{
 
     @Override
     public ResponseType getType() {
-        return ResponseType.HEARTBEAT;
+        return ResponseType.UPDATE_TOKEN;
     }
 
     @Override

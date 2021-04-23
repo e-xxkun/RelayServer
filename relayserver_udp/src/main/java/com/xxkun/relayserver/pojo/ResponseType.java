@@ -9,8 +9,7 @@ public enum ResponseType {
 
     UPDATE_TOKEN(5),
 
-    PUNCH(6),
-    HEARTBEAT(7);
+    PUNCH(6);
 
     final int code;
 

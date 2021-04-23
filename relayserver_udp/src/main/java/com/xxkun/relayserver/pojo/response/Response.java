@@ -39,6 +39,10 @@ public abstract class Response{
         return null;
     }
 
+    public static int getHeadLength() {
+        return HEAD_LEN;
+    }
+
     public abstract ResponseType getType();
 
     protected abstract int getBodyLength();

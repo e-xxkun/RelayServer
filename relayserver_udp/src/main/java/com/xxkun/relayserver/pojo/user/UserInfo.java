@@ -88,7 +88,4 @@ public class UserInfo {
         return null;
     }
 
-    public int bytesLength() {
-        return 0;
-    }
 }

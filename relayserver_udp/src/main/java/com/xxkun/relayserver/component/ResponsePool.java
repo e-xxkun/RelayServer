@@ -1,13 +1,13 @@
 package com.xxkun.relayserver.component;
 
-import com.xxkun.relayserver.pojo.response.HeartbeatResponse;
+import com.xxkun.relayserver.pojo.response.UpdateTokenResponse;
 import com.xxkun.relayserver.pojo.response.PunchResponse;
 import com.xxkun.relayserver.pojo.response.UserExceptionResponse;
 
 import java.net.InetSocketAddress;
 
 public class ResponsePool {
-    public static HeartbeatResponse createHeartbeatResponse(InetSocketAddress socketAddress) {
+    public static UpdateTokenResponse createHeartbeatResponse(InetSocketAddress socketAddress) {
         return null;
     }
 
