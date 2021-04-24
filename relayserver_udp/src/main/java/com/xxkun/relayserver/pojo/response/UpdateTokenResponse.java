@@ -36,6 +36,9 @@ public class UpdateTokenResponse extends Response{
 
     @Override
     protected void overwrite(TransferPacket.BodyBuffer bodyBuffer) {
-        bodyBuffer.putString(userInfo.getSession().getToken());
+        bodyBuffer.position(getHeadLength());
+        String token = userInfo.getSession().getToken();
+        bodyBuffer.put((byte) (token.length() & 0xff));
+        bodyBuffer.putString(token);
     }
 }
