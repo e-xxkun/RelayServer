@@ -43,7 +43,7 @@ public class Client {
             while (true) {
                 try {
                     in.nextLine();
-                    TransferPacket packet = new TransferPacket(socketAddress);
+                    TransferPacket packet = new TransferPacket(new TransferPacket.BodyBuffer(),socketAddress);
                     server.send(packet);
                 } catch (IOException e) {
                     e.printStackTrace();
