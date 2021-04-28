@@ -3,13 +3,9 @@ package com.xxkun.relayserver.pojo.request;
 import com.xxkun.relayserver.component.exception.RequestResolutionException;
 import com.xxkun.relayserver.pojo.RequestType;
 import com.xxkun.udptransfer.TransferPacket;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.NonNull;
 
 import java.net.InetSocketAddress;
 import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
-import java.util.Date;
 
 public final class Request {
 

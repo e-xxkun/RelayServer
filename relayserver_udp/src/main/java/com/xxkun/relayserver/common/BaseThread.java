@@ -1,4 +1,4 @@
-package com.xxkun.relayserver.component;
+package com.xxkun.relayserver.common;
 
 public class BaseThread extends Thread {
 

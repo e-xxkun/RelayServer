@@ -1,6 +1,6 @@
 package com.xxkun.relayserver.receive;
 
-import com.xxkun.relayserver.component.BaseThread;
+import com.xxkun.relayserver.common.BaseThread;
 import com.xxkun.relayserver.component.exception.RequestResolutionException;
 import com.xxkun.relayserver.pojo.request.Request;
 import com.xxkun.udptransfer.TransferPacket;

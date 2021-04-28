@@ -1,6 +1,6 @@
 package com.xxkun.relayserver.component.queue;
 
-import com.xxkun.relayserver.component.BaseThread;
+import com.xxkun.relayserver.common.BaseThread;
 import com.xxkun.relayserver.pojo.request.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
