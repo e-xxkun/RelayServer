@@ -24,7 +24,8 @@ public class TransferPacket implements Delayed {
     private Long sendTime;
 
     private final BodyBuffer buffer;
-    
+    private OnACKListener onACKListener;
+
     public TransferPacket(BodyBuffer buffer, InetSocketAddress socketAddress) {
         this(buffer, socketAddress, Type.GET);
     }
@@ -152,6 +153,17 @@ public class TransferPacket implements Delayed {
         return packet;
     }
 
+    protected void ack() {
+        System.out.println("ACK");
+        if (onACKListener != null) {
+            onACKListener.onACK(this);
+        }
+    }
+
+    public void setOnACKListener(OnACKListener onACKListener) {
+        this.onACKListener = onACKListener;
+    }
+
     @Override
     public long getDelay(TimeUnit unit) {
         return unit.convert(sendTime + RTO - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
@@ -173,6 +185,10 @@ public class TransferPacket implements Delayed {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    public interface OnACKListener {
+        void onACK(TransferPacket packet);
     }
 
     public enum Type {

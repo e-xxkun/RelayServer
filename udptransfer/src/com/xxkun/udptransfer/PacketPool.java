@@ -44,7 +44,8 @@ public class PacketPool {
         Client client = clientMap.get(packet.getSocketAddress());
         if (client != null) {
 //            packetQueue.remove(response);
-            client.removePacket(packet);
+            TransferPacket srcPacket = client.removePacket(packet);
+            srcPacket.ack();
             if (client.packetCount() == 0) {
                 clientMap.remove(client.getSocketAddress());
             }
@@ -102,7 +103,7 @@ public class PacketPool {
             packetMap.put(packet, packet);
         }
 
-        public void removePacket(TransferPacket packet) {
+        public TransferPacket removePacket(TransferPacket packet) {
             TransferPacket srcPacket = packetMap.remove(packet);
             if (srcPacket != null) {
                 if (packet.getReceiveTime() == null) {
@@ -112,6 +113,7 @@ public class PacketPool {
                     updateRtt(packet);
                 }
             }
+            return srcPacket;
         }
 
 //        https://www.cnblogs.com/lshs/p/6038535.html

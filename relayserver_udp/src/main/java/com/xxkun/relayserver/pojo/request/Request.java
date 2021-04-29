@@ -55,7 +55,7 @@ public final class Request {
     }
 
     public static Request decodeFromByteArray(TransferPacket.BodyBuffer buffer, InetSocketAddress socketAddress) throws RequestResolutionException {
-        if (buffer.getBodyLength() < HEAD_LEN) {
+        if  (buffer.getBodyLength() < HEAD_LEN) {
             throw new RequestResolutionException();
         }
         // client_version|type|token  ->  int|int|char[16]
@@ -64,8 +64,8 @@ public final class Request {
         String token;
         try {
             clientVersion = buffer.getInt();
-            token = buffer.getString(TOKEN_LEN);
             code = buffer.getInt();
+            token = buffer.getString(TOKEN_LEN);
         } catch (BufferUnderflowException e) {
             throw new RequestResolutionException();
         }
