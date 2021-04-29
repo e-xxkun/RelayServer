@@ -54,7 +54,7 @@ public class PacketPool {
     private boolean hasConfirmed(TransferPacket packet) {
         Client client = clientMap.get(packet.getSocketAddress());
         if (client != null) {
-            return client.containsPacket(packet);
+            return !client.containsPacket(packet);
         }
         return true;
     }

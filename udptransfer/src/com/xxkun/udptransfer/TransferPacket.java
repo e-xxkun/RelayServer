@@ -11,7 +11,7 @@ public class TransferPacket implements Delayed {
     private static final int HEAD = 0xFEFDDFEB;
     // HEAD|sequence|type|bodyLength -> int|long|byte|int
     public static final int HEAD_LEN = Integer.BYTES + Long.BYTES + Byte.BYTES + Integer.BYTES;
-    private static int MAX_RESEND_TIME = 4;
+    private static int MAX_RESEND_TIME = 3;
 
     private Long sequence;
     private int resendTime = 0;
@@ -154,13 +154,12 @@ public class TransferPacket implements Delayed {
 
     @Override
     public long getDelay(TimeUnit unit) {
-        return RTO;
+        return unit.convert(sendTime + RTO - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Override
     public int compareTo(Delayed o) {
-        return (sendTime - ((TransferPacket) o).sendTime
-                + getDelay(TimeUnit.SECONDS) -  o.getDelay(TimeUnit.SECONDS)) <= 0 ? -1 : 1;
+        return (int) (sendTime - ((TransferPacket) o).sendTime + RTO - ((TransferPacket) o).RTO);
     }
 
     @Override

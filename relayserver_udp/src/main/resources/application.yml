@@ -14,7 +14,7 @@ spring:
 
 udpserver:
   common:
-    port: 8876
+    port: 8874
   MSG_BUFF_LEN:
     request: 512
     response: 512

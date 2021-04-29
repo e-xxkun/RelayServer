@@ -1,7 +1,10 @@
 package com.xxkun.relayserver.component.handler;
 
 import com.xxkun.relayserver.component.ResponsePool;
+import com.xxkun.relayserver.pojo.IInnerMessageType;
 import com.xxkun.relayserver.pojo.IMessageType;
+import com.xxkun.relayserver.pojo.InnerMessageType;
+import com.xxkun.relayserver.pojo.MessageFactory;
 import com.xxkun.relayserver.pojo.request.Message;
 import com.xxkun.relayserver.pojo.response.UpdateTokenResponse;
 import com.xxkun.relayserver.pojo.user.UserInfo;
@@ -17,8 +20,8 @@ public class RefreshSessionHandler extends MessageHandler {
     @Autowired
     private ResponseSender responseSender;
     @Override
-    public IMessageType getInnerMessageType() {
-        return null;
+    public IInnerMessageType getInnerMessageType() {
+        return InnerMessageType.REFRESH_SESSION;
     }
 
     @Override
