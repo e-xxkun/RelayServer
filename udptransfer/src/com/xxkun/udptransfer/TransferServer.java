@@ -1,10 +1,7 @@
 package com.xxkun.udptransfer;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,6 +21,10 @@ public class TransferServer implements PacketPool.OnPacketConfirmTimeout {
     public TransferServer(int port) throws SocketException {
         socket = new DatagramSocket(port);
         init();
+    }
+
+    public SocketAddress getLocalSocketAddress() {
+        return socket.getLocalSocketAddress();
     }
 
     public TransferServer() throws SocketException {
