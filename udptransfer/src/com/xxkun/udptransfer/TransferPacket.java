@@ -154,7 +154,6 @@ public class TransferPacket implements Delayed {
     }
 
     protected void ack() {
-        System.out.println("ACK");
         if (onACKListener != null) {
             onACKListener.onACK(this);
         }

@@ -19,7 +19,6 @@ udpserver:
     request: 512
     response: 512
 
-
 # redis key
 redis:
   key:
